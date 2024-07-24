@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>1db0b598-ecb1-4567-ae36-79a3a15d32fb</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>query.py</StartupFile>
+    <StartupFile>proccess.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
