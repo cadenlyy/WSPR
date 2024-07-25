@@ -35,6 +35,7 @@ def wsprlive_get(col, database, ts, te, l=100):
     # return the json decoded data
     return json.loads(contents.decode("UTF-8"))["data"]
 
+#test
 if __name__ == "__main__":
     #print(wsprlive_get("DESC wspr.rx"))
     print(wsprlive_get("*", "rx", '2024-07-24 09:05:00', '2024-07-24 09:06:00', 10))
