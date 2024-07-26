@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>1db0b598-ecb1-4567-ae36-79a3a15d32fb</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>proccess.py</StartupFile>
+    <StartupFile>src\proccess.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -21,8 +21,11 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="proccess.py" />
-    <Compile Include="query.py" />
+    <Compile Include="src\proccess.py" />
+    <Compile Include="src\query.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="src\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

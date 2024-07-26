@@ -23,9 +23,12 @@ import json
 #|version   |LowCardinality(String)|
 #|code      |Int8                  |
 
-def wsprlive_get(col, database, ts, te, l=100):
+def wsprlive_get(col, database, ts, te, l=None):
     # put together the request url
-    q = "SELECT " + col + " FROM " + database + " WHERE time >= '" + ts + "' AND time < '" + te + "' Limit " + str(l)
+    if l == None:    
+        q = "SELECT " + col + " FROM " + database + " WHERE time >= '" + ts + "' AND time < '" + te+ "'"
+    else:
+        q = "SELECT " + col + " FROM " + database + " WHERE time >= '" + ts + "' AND time < '" + te + "' Limit " + str(l)
 
     url = "https://db1.wspr.live/?query=" + urllib.parse.quote_plus(q + " FORMAT JSON")
 
@@ -38,4 +41,4 @@ def wsprlive_get(col, database, ts, te, l=100):
 #test
 if __name__ == "__main__":
     #print(wsprlive_get("DESC wspr.rx"))
-    print(wsprlive_get("*", "rx", '2024-07-24 09:05:00', '2024-07-24 09:06:00', 10))
+    print(wsprlive_get("*", "rx", '2024-07-24 09:05:00', '2024-07-24 09:06:00'))

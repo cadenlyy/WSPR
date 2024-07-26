@@ -6,10 +6,12 @@ def mean(cm, v, l):
     return (cm*l+v)/(l+1)
 
 #adjList with weight
-transmitions = {}#dict mapping receiver to dict of transmitters with array of mean(freq snr and drift) with transmitions containing arrays of transmittion details (i.e a{{[[0,0,0],[]]}})
+transmitions = {} #dict mapping receiver to dict of transmitters with array of mean(freq snr and drift) with transmitions containing arrays of transmittion details (i.e a{{[[0,0,0],[]]}})
 
-#colums, database, start dateTime, end dateTime, limit = 100
-q = query.wsprlive_get("*", "rx", '2024-07-24 09:24:00', '2024-07-24 09:25:00', 10000)
+#colums, database, start dateTime, end dateTime, limit = None
+q = query.wsprlive_get("*", "rx", '2024-07-24 09:24:00', '2024-07-24 09:25:00', None)
+
+print("wspr.rx query successful") #check if proccessing is slow
 
 for i in q: #proccess each spot
     data = list(i.values())
