@@ -3,12 +3,12 @@
   "WorkspaceRootPath": "C:\\Users\\caden\\Documents\\code\\Real\\WSPR\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{1DB0B598-ECB1-4567-AE36-79A3A15D32FB}|WSPR.pyproj|C:\\Users\\caden\\Documents\\code\\Real\\WSPR\\src\\query.py||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{1DB0B598-ECB1-4567-AE36-79A3A15D32FB}|WSPR.pyproj|solutionrelative:src\\query.py||{8B382828-6202-11D1-8870-0000F87579D2}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{1DB0B598-ECB1-4567-AE36-79A3A15D32FB}|WSPR.pyproj|C:\\Users\\caden\\Documents\\code\\Real\\WSPR\\src\\proccess.py||{8B382828-6202-11D1-8870-0000F87579D2}",
       "RelativeMoniker": "D:0:0:{1DB0B598-ECB1-4567-AE36-79A3A15D32FB}|WSPR.pyproj|solutionrelative:src\\proccess.py||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1DB0B598-ECB1-4567-AE36-79A3A15D32FB}|WSPR.pyproj|C:\\Users\\caden\\Documents\\code\\Real\\WSPR\\src\\query.py||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{1DB0B598-ECB1-4567-AE36-79A3A15D32FB}|WSPR.pyproj|solutionrelative:src\\query.py||{8B382828-6202-11D1-8870-0000F87579D2}"
     }
   ],
   "DocumentGroupContainers": [
@@ -18,30 +18,30 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 0,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "proccess.py",
               "DocumentMoniker": "C:\\Users\\caden\\Documents\\code\\Real\\WSPR\\src\\proccess.py",
               "RelativeDocumentMoniker": "src\\proccess.py",
               "ToolTip": "C:\\Users\\caden\\Documents\\code\\Real\\WSPR\\src\\proccess.py",
               "RelativeToolTip": "src\\proccess.py",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAB4AAAATAAAA",
+              "ViewState": "AQIAABYAAAAAAAAAAAAmwCMAAABJAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
               "WhenOpened": "2024-07-24T09:20:42.588Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "query.py",
               "DocumentMoniker": "C:\\Users\\caden\\Documents\\code\\Real\\WSPR\\src\\query.py",
               "RelativeDocumentMoniker": "src\\query.py",
               "ToolTip": "C:\\Users\\caden\\Documents\\code\\Real\\WSPR\\src\\query.py",
               "RelativeToolTip": "src\\query.py",
-              "ViewState": "AQIAABQAAAAAAAAAAAAAACYAAAA3AAAA",
+              "ViewState": "AQIAABUAAAAAAAAAAAAAAB0AAABbAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
               "WhenOpened": "2024-07-24T08:18:35.707Z",
               "EditorCaption": ""
