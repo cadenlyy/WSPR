@@ -14,9 +14,14 @@ print("wspr.rx query successful") #check if proccessing is slow
 
 #adjList with weight
 transmitions = {} #dict mapping receiver to dict of transmitters with array of mean(freq snr and drift in a set range) with transmitions containing arrays of transmittion details (i.e a{{[[[0,0,0],]]}})
+#Mean at time
+meanAtTime = {}#for sliding window
 
 def mean(cm, v, l):
     return (cm*l+v)/(l+1)
+
+def roundEvenDateTime(a): #YYYY-MM-DD HH:MM:SS
+    return datetime.datetime.strptime(str(a)[:15]+str(int(str(a)[15])%2+int(str(a)[15]))+str(a)[16:], '%Y-%m-%d %H:%M:%S')
 
 MR = datetime.time(0,0,1)
 
@@ -30,11 +35,14 @@ for i in q: #proccess each spot
         transmitions.get(tuple(data[3:7])).update({tuple(data[7:11]):[]})
     #pushing in transmittion info                                   (mean: freq, snr, drift SD: freq, snr, drift)
     transmitions.get(tuple(data[3:7])).get(tuple(data[7:11])).append([0,0,0,0,0,0]+data[0:3]+data[11:])
+    
     #calculating mean and SD
+    meanAtTime.update({data[1]:[0,0,0]})
     if((datetime.datetime.min + abs(datetime.datetime.strptime(data[1], '%Y-%m-%d %H:%M:%S')-ts)).time() < MR):
-        transmitions.get(tuple(data[3:7])).get(tuple(data[7:11]))[0][0]=mean(transmitions.get(tuple(data[3:7])).get(tuple(data[7:11]))[0][0],data[14],len(transmitions.get(tuple(data[3:7])).get(tuple(data[7:11])))-1)
-        transmitions.get(tuple(data[3:7])).get(tuple(data[7:11]))[0][1]=mean(transmitions.get(tuple(data[3:7])).get(tuple(data[7:11]))[0][1],data[16],len(transmitions.get(tuple(data[3:7])).get(tuple(data[7:11])))-1)
-        transmitions.get(tuple(data[3:7])).get(tuple(data[7:11]))[0][2]=mean(transmitions.get(tuple(data[3:7])).get(tuple(data[7:11]))[0][2],data[17],len(transmitions.get(tuple(data[3:7])).get(tuple(data[7:11])))-1)
-   # else:
-        #transmitions.get(tuple(data[3:7])).get(tuple(data[7:11]))[0][0]=2
-print(transmitions)
+        meanAtTime.get(str(roundEvenDateTime(ts)))[0]=mean(meanAtTime.get(str(roundEvenDateTime(ts)))[0],data[14],len(transmitions.get(tuple(data[3:7])).get(tuple(data[7:11])))-1)
+        meanAtTime.get(str(roundEvenDateTime(ts)))[1]=mean(meanAtTime.get(str(roundEvenDateTime(ts)))[1],data[16],len(transmitions.get(tuple(data[3:7])).get(tuple(data[7:11])))-1)
+        meanAtTime.get(str(roundEvenDateTime(ts)))[2]=mean(meanAtTime.get(str(roundEvenDateTime(ts)))[2],data[17],len(transmitions.get(tuple(data[3:7])).get(tuple(data[7:11])))-1)
+    #else:
+        #meanAtTime.get(data[1])[0] = 'a'
+print(meanAtTime)
+print( meanAtTime.get(str(roundEvenDateTime(ts)))[0])
