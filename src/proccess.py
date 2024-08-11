@@ -17,8 +17,17 @@ transmitions = {} #dict mapping receiver to dict of transmitters with array of m
 #Mean at time
 meanAtTime = {}#for sliding window
 
-def mean(cm, v, l):
-    return (cm*l+v)/(l+1)
+def mean(v, l):
+    return sum(v)/l
+
+def addMean(cm, v, cl, vl=len(v)):
+    return mean([cm*cl,sum(v)],cl+vl)    
+
+def subMean(cm, v, cl, vl=len(v)):
+    return mean([cm*cl,-sum(v)],cl-vl) 
+
+def slideMean(cm, sv, av, cl, svl=len(sv), avl=len(av)):
+    return addMean(subMean(cm,sv,cl,svl),av,cl-svl,avl)
 
 def roundEvenDateTime(a): #YYYY-MM-DD HH:MM:SS
     return datetime.datetime.strptime(str(a)[:15]+str(int(str(a)[15])%2+int(str(a)[15]))+str(a)[16:], '%Y-%m-%d %H:%M:%S')
@@ -39,10 +48,10 @@ for i in q: #proccess each spot
     #calculating mean and SD
     meanAtTime.update({data[1]:[0,0,0]})
     if((datetime.datetime.min + abs(datetime.datetime.strptime(data[1], '%Y-%m-%d %H:%M:%S')-ts)).time() < MR):
-        meanAtTime.get(str(roundEvenDateTime(ts)))[0]=mean(meanAtTime.get(str(roundEvenDateTime(ts)))[0],data[14],len(transmitions.get(tuple(data[3:7])).get(tuple(data[7:11])))-1)
-        meanAtTime.get(str(roundEvenDateTime(ts)))[1]=mean(meanAtTime.get(str(roundEvenDateTime(ts)))[1],data[16],len(transmitions.get(tuple(data[3:7])).get(tuple(data[7:11])))-1)
-        meanAtTime.get(str(roundEvenDateTime(ts)))[2]=mean(meanAtTime.get(str(roundEvenDateTime(ts)))[2],data[17],len(transmitions.get(tuple(data[3:7])).get(tuple(data[7:11])))-1)
-    #else:
-        #meanAtTime.get(data[1])[0] = 'a'
+        meanAtTime.get(str(roundEvenDateTime(ts)))[0]=addMean(meanAtTime.get(str(roundEvenDateTime(ts)))[0],[data[14]],len(transmitions.get(tuple(data[3:7])).get(tuple(data[7:11])))-1)
+        meanAtTime.get(str(roundEvenDateTime(ts)))[1]=addMean(meanAtTime.get(str(roundEvenDateTime(ts)))[1],[data[16]],len(transmitions.get(tuple(data[3:7])).get(tuple(data[7:11])))-1)
+        meanAtTime.get(str(roundEvenDateTime(ts)))[2]=addMean(meanAtTime.get(str(roundEvenDateTime(ts)))[2],[data[17]],len(transmitions.get(tuple(data[3:7])).get(tuple(data[7:11])))-1)
+    elif((datetime.datetime.min + abs(te-datetime.datetime.strptime(data[1], '%Y-%m-%d %H:%M:%S'))).time() < MR):
+        meanAtTime.get(data[1])[0] = 'a'
 print(meanAtTime)
 print( meanAtTime.get(str(roundEvenDateTime(ts)))[0])
