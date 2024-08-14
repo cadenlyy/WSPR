@@ -15,26 +15,6 @@ print("wspr.rx query successful") #check if proccessing is slow
 #adjList with weight
 transmitions = {} #dict mapping receiver to dict of transmitters with dictionary mapping time to 3 arrays, one of spot details, one for sum and one for mean (i.e a{{{[[[]],[],[]}}})
 
-def mean(v, l):
-    return sum(v)/l
-
-def addMean(cm, v, cl, vl=-1):
-    if (vl == -1):
-        vl = len(v)
-    return mean([cm*cl,sum(v)],cl+vl)    
-
-def subMean(cm, v, cl, vl=-1):
-    if (vl == -1):
-        vl = len(v)
-    return mean([cm*cl,-sum(v)],cl-vl) 
-
-def slideMean(cm, sv, av, cl, svl=-1, avl=-1):
-    if (svl == -1):
-        svl = len(sv)
-    if (avl == -1):
-        avl = len(av)
-    return addMean(subMean(cm,sv,cl,svl),av,cl-svl,avl)
-
 def roundEvenDateTime(a): #YYYY-MM-DD HH:MM:SS
     return datetime.datetime.strptime(str(a)[:15]+str(int(str(a)[15])%2+int(str(a)[15]))+str(a)[16:], '%Y-%m-%d %H:%M:%S')
 
@@ -50,7 +30,7 @@ for i in q: #proccess each spot
         transmitions.get(tuple(data[3:7])).update({tuple(data[7:11]):{}})
     #adding new time
     if transmitions.get(tuple(data[3:7])).get(tuple(data[7:11])).get(data[1]) == None:
-        transmitions.get(tuple(data[3:7])).get(tuple(data[7:11])).update({data[1]:[[],[0,0,0],[0,0,0]]})
+        transmitions.get(tuple(data[3:7])).get(tuple(data[7:11])).update({data[1]:[[],[0,0,0],[None,None,None]]})
     #pushing in transmittion info                                   (SD: freq, snr, drift)
     transmitions.get(tuple(data[3:7])).get(tuple(data[7:11])).get(data[1])[0].append([0,0,0]+data)
     
@@ -64,11 +44,9 @@ for r in transmitions.items():
     for t in r[1].items():
         for d in t[1].items():
             slidingWindow = [0,0,0]
-            if datetime.datetime.strptime(d[0], '%Y-%m-%d %H:%M:%S') < ts+MR:
+            if datetime.datetime.strptime(d[0], '%Y-%m-%d %H:%M:%S') < ts+2*MR:
                 for i in d[1][0]:
                     slidingWindow[0]+=i[17]
-                transmitions.get(r[0]).get(t[0]).get(d[0])[2][0] = None
-                transmitions.get(r[0]).get(t[0]).get(d[0])[2][1] = None
-                transmitions.get(r[0]).get(t[0]).get(d[0])[2][2] = None
-
-print(transmitions)
+                    slidingWindow[1]+=i[19]
+                    slidingWindow[2]+=i[20]
+                transmitions.get(r[0]).get(t[0]).get(d[0])[2][0]=slidingWindow[0]/len(d[1][0])
