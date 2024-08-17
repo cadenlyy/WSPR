@@ -1,3 +1,4 @@
+from readline import set_completion_display_matches_hook
 import query
 import datetime
 
@@ -42,11 +43,13 @@ for i in q: #proccess each spot
 #sliding(only actually going through each spot once so still O(N))   
 for r in transmitions.items():
     for t in r[1].items():
-        for d in t[1].items():
-            slidingWindow = [0,0,0]
-            if datetime.datetime.strptime(d[0], '%Y-%m-%d %H:%M:%S') < ts+2*MR:
-                for i in d[1][0]:
-                    slidingWindow[0]+=i[17]
-                    slidingWindow[1]+=i[19]
-                    slidingWindow[2]+=i[20]
-                transmitions.get(r[0]).get(t[0]).get(d[0])[2][0]=slidingWindow[0]/len(d[1][0])
+        numOfSpots = 0
+        left = 0
+        right = 0
+        slidingWindow[0,0,0]
+        for i in range(0, len(t[1])):
+            if datetime.datetime.strptime(list(t[1])[i], '%Y-%m-%d %H:%M:%S') - ts < MR:
+                slidingWindow[0] += t[1].get(list(t[1][i]))[1][0]
+                    
+#print(transmitions)
+                    
