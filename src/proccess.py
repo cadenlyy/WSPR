@@ -1,4 +1,3 @@
-from readline import set_completion_display_matches_hook
 import query
 import datetime
 
@@ -46,10 +45,40 @@ for r in transmitions.items():
         numOfSpots = 0
         left = 0
         right = 0
-        slidingWindow[0,0,0]
+        slidingWindow = [0,0,0]
         for i in range(0, len(t[1])):
             if datetime.datetime.strptime(list(t[1])[i], '%Y-%m-%d %H:%M:%S') - ts < MR:
-                slidingWindow[0] += t[1].get(list(t[1][i]))[1][0]
+                slidingWindow[0] += t[1].get(list(t[1])[i])[1][0]
+                slidingWindow[1] += t[1].get(list(t[1])[i])[1][1]
+                slidingWindow[2] += t[1].get(list(t[1])[i])[1][2]
+                numOfSpots += len(t[1].get(list(t[1])[i])[0])
+                #print(len(t[1].get(list(t[1])[i])[0]))
+                right = i
+            else:
+                for j in  range(left, i):
+                    if datetime.datetime.strptime(list(t[1])[j], '%Y-%m-%d %H:%M:%S') - datetime.datetime.strptime(list(t[1])[i], '%Y-%m-%d %H:%M:%S') > MR:
+                        slidingWindow[0] -= t[1].get(list(t[1])[j])[1][0]
+                        slidingWindow[1] -= t[1].get(list(t[1])[j])[1][1]
+                        slidingWindow[2] -= t[1].get(list(t[1])[j])[1][2]
+                        numOfSpots -= len(t[1].get(list(t[1])[j])[0])
+                        #print(len(t[1].get(list(t[1])[j])[0]))
+                    else:
+                        left = j
+                        break
+                for j in  range(right, len(t[1])):
+                    if datetime.datetime.strptime(list(t[1])[j], '%Y-%m-%d %H:%M:%S') - datetime.datetime.strptime(list(t[1])[i], '%Y-%m-%d %H:%M:%S') < MR:
+                        slidingWindow[0] += t[1].get(list(t[1])[j])[1][0]
+                        slidingWindow[1] += t[1].get(list(t[1])[j])[1][1]
+                        slidingWindow[2] += t[1].get(list(t[1])[j])[1][2]
+                        numOfSpots += len(t[1].get(list(t[1])[j])[0])
+                        #print(len(t[1].get(list(t[1])[j])[0]))
+                    else:
+                        right = j
+                        break
+            transmitions.get(r[0]).get(t[0]).get(list(t[1])[i])[2][0] = slidingWindow[0]/numOfSpots
+            transmitions.get(r[0]).get(t[0]).get(list(t[1])[i])[2][1] = slidingWindow[1]/numOfSpots
+            transmitions.get(r[0]).get(t[0]).get(list(t[1])[i])[2][2] = slidingWindow[2]/numOfSpots
+            print(slidingWindow[0],numOfSpots)
                     
-#print(transmitions)
+print(transmitions)    
                     
