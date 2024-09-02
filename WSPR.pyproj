@@ -21,6 +21,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="src\test.py" />
     <Compile Include="src\proccess.py" />
     <Compile Include="src\query.py" />
   </ItemGroup>

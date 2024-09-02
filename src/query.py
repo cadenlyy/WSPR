@@ -26,7 +26,6 @@ import json
 def wsprlive_get(col, database, ts, te, l=None):
     # put together the request url
     if l == None:   
-        print('a')
         q = "SELECT " + col + " FROM " + database + " WHERE time >= '" + ts + "' AND time < '" + te + "'"
     else:
         q = "SELECT " + col + " FROM " + database + " WHERE time >= '" + ts + "' AND time < '" + te + "' Limit " + str(l)
