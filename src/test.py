@@ -1,16 +1,16 @@
-import math
+import csv
 
-def SD(s, m, n):#sum of x^2, mean, number of values
-    try:
-        return math.sqrt(s/n-m**2)
-    except ValueError:
-        print("error")
-        return "error"
-    
-def test(s, m , n):
-    return s/n-m**2
-    
-x = [1473642704995, -6158, -19, 3536844986946222499181, 61778, 75]
-y = 623
-    
-print(test(3485001982832301863885,1452042079147/605,605))
+data = [
+    {'name': 'Nikhil', 'branch': 'COE', 'year': 2, 'cgpa': 9.0},
+    {'name': 'Sanchit', 'branch': 'COE', 'year': 2, 'cgpa': 9.1},
+    {'name': 'Aditya', 'branch': 'IT', 'year': 2, 'cgpa': 9.3},
+    {'name': 'Sagar', 'branch': 'SE', 'year': 1, 'cgpa': 9.5},
+    {'name': 'Prateek', 'branch': 'MCE', 'year': 3, 'cgpa': 7.8},
+    {'name': 'Sahil', 'branch': 'EP', 'year': 2, 'cgpa': 9.1}
+]
+
+with open('university_records.csv', 'w', newline='') as csvfile:
+    fieldnames = ['name', 'branch', 'year', 'cgpa']
+    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+    writer.writeheader()
+    writer.writerows(data)
