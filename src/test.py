@@ -9,7 +9,7 @@ data = [
     {'name': 'Sahil', 'branch': 'EP', 'year': 2, 'cgpa': 9.1}
 ]
 
-with open('university_records.csv', 'w', newline='') as csvfile:
+with open('wspr.csv', 'w', newline='') as csvfile:
     fieldnames = ['name', 'branch', 'year', 'cgpa']
     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
     writer.writeheader()

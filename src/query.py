@@ -34,7 +34,6 @@ def wsprlive_get(col, database, ts, te, rx = None, tx = None, l=None):
     if l != None:
         q += " Limit " + str(l)
 
-    print(q)
     url = "https://db1.wspr.live/?query=" + urllib.parse.quote_plus(q + " FORMAT JSON")
 
     # download contents from wspr.live

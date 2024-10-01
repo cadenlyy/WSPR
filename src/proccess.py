@@ -146,8 +146,22 @@ def one_pair(MR,ts,te,rx,tx):
     q = query.wsprlive_get("*", "rx", str(ts), str(te), rx, tx)
     print("wspr.rx query successful") #check if proccessing is slow
 
+    data = []
+    b = q[0]['band']
+    for i in q:
+        if i['band'] == b:
+            data.append({'time': i['time'], 'band': i['band'], 'frequency': i['frequency'], 'snr': i['snr'], 'drift':i['drift']})
+    
+    data = sorted(data, key=lambda d: d['time'])
+    
     #id, time, band, rx_sign, rx_lat, rx_lon, rx_loc, tx_sign, tx_lat, tx_lon, tx_loc, distance, azimuth, rx_azimuth, *frequency, power, *snr, *drift, version, code
     with open('wspr.csv', 'w', newline='') as csvfile:
+        fieldnames = ['time', 'band', 'frequency', 'snr', 'drift']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(data)
+        
+one_pair(MR,'2024-09-01 00:00:00', '2024-10-01 00:00:00', 'KJ6MKI', 'W6LPM')
         
 
                     
