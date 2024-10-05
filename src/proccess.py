@@ -30,8 +30,8 @@ MR = datetime.timedelta(minutes = 10)
 def all_spots(MR,ts,te):
     #wspr query
     #colums, database, start dateTime, end dateTime, rx_sign = None, tx_sign = None limit = None
-    q = query.wsprlive_get("*", "rx", str(ts), str(te))
-    #q = [{'id': '8100420947', 'time': '2024-07-24 09:26:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 1, 'power': 23, 'snr': 1, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'id': '8100420947', 'time': '2024-07-24 09:26:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 2, 'power': 23, 'snr': -7, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'id': '8100420947', 'time': '2024-07-24 09:28:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 1000000000000000000000000, 'power': 23, 'snr': 3, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'id': '8100420947', 'time': '2024-07-24 09:30:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 4, 'power': 23, 'snr': -10, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1}]
+    #q = query.wsprlive_get("*", "rx", str(ts), str(te))
+    q = [{'id': '8100420947', 'time': '2024-07-24 09:26:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 1, 'power': 23, 'snr': 1, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'id': '8100420947', 'time': '2024-07-24 09:26:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 2, 'power': 23, 'snr': -7, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'id': '8100420947', 'time': '2024-07-24 09:28:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 1000000000000000000000000, 'power': 23, 'snr': 3, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'id': '8100420947', 'time': '2024-07-24 09:30:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 4, 'power': 23, 'snr': -10, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1}]
     print("wspr.rx query successful") #check if proccessing is slow
     
     
@@ -72,7 +72,7 @@ def all_spots(MR,ts,te):
             right = 0
             slidingWindow = [0,0,0,0,0,0]#sum:freq,snr,drift,sum:freq^2,snr^2,drift^2
             for i in range(0, len(t[1])):
-                if datetime.datetime.strptime(list(t[1])[i], '%Y-%m-%d %H:%M:%S') - ts < MR:
+                if datetime.datetime.strptime(list(t[1])[i], '%Y-%m-%d %H:%M:%S') - ts < MR:                 
                     slidingWindow[0] += t[1].get(list(t[1])[i])[1][0]
                     slidingWindow[1] += t[1].get(list(t[1])[i])[1][1]
                     slidingWindow[2] += t[1].get(list(t[1])[i])[1][2]
@@ -81,9 +81,11 @@ def all_spots(MR,ts,te):
                     slidingWindow[5] += t[1].get(list(t[1])[i])[1][5]
                     numOfSpots += len(t[1].get(list(t[1])[i])[0])
                     right = i+1
+                    
                 elif te - datetime.datetime.strptime(list(t[1])[i], '%Y-%m-%d %H:%M:%S') < MR:
                     break
                 else:
+                    print(left,right)
                     for j in  range(left, i+1):
                         if datetime.datetime.strptime(list(t[1])[i], '%Y-%m-%d %H:%M:%S') - datetime.datetime.strptime(list(t[1])[j], '%Y-%m-%d %H:%M:%S') > MR:
                             slidingWindow[0] -= t[1].get(list(t[1])[j])[1][0]
@@ -136,32 +138,127 @@ def all_spots(MR,ts,te):
                         if abs(ss(j[14],i[1][1][6],i[1][1][9]))  >= ssT or abs(ss(j[16],i[1][1][7],i[1][1][10]))  >= ssT or abs(ss(j[17],i[1][1][8],i[1][1][11]))  >= ssT:
                             abnormallies.append(j)
                         
-    print(abnormallies)
+    print(transmitions)
 
     print(len(q),len(abnormallies))
     
 def one_pair(MR,ts,te,rx,tx):
     #wspr query
     #colums, database, start dateTime, end dateTime, rx_sign = None, tx_sign = None limit = None
-    q = query.wsprlive_get("*", "rx", str(ts), str(te), rx, tx)
+    #q = query.wsprlive_get("*", "rx", str(ts), str(te), rx, tx)
+    q = [{'id': '8100420947', 'time': '2024-07-24 09:26:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 1, 'power': 23, 'snr': 1, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'id': '8100420947', 'time': '2024-07-24 09:26:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 2, 'power': 23, 'snr': -7, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'id': '8100420947', 'time': '2024-07-24 09:28:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 1000000000000000000000000, 'power': 23, 'snr': 3, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'id': '8100420947', 'time': '2024-07-24 09:30:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 4, 'power': 23, 'snr': -10, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1}]
     print("wspr.rx query successful") #check if proccessing is slow
-
-    data = []
-    b = q[0]['band']
-    for i in q:
-        if i['band'] == b:
-            data.append({'time': i['time'], 'band': i['band'], 'frequency': i['frequency'], 'snr': i['snr'], 'drift':i['drift']})
-    
-    data = sorted(data, key=lambda d: d['time'])
     
     #id, time, band, rx_sign, rx_lat, rx_lon, rx_loc, tx_sign, tx_lat, tx_lon, tx_loc, distance, azimuth, rx_azimuth, *frequency, power, *snr, *drift, version, code
-    with open('wspr.csv', 'w', newline='') as csvfile:
-        fieldnames = ['time', 'band', 'frequency', 'snr', 'drift']
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        writer.writeheader()
-        writer.writerows(data)
+
+    #extract needed data
+    data = []
+    transmitions = {}
+    b = q[0].get('band')
+    for i in q:
+        if i.get('band') == b:#ensure same band
+            #adding new time
+            if transmitions.get(i.get('time')) == None:
+                transmitions.update({i.get('time'):[[],[0,0,0,0,0,0,None,None,None,None,None,None,None,[]]]})#[sum:freq,snr,drift,sum:freq^2,snr^2,drift^2,mean:freq,snr,drift,SD:freq,snr,drift,numOfSpots,sliding window]
+            
+            #pushing in new data  
+            transmitions.get(i.get('time'))[0].append([i.get('band'),i.get('frequency'),i.get('snr'),i.get('drift'),0,0,0])#SS: freq, snr, drfit
+            
+            #calculating sum for freq, SNR and drift
+            transmitions.get(i.get('time'))[1][0]+=i.get('frequency')
+            transmitions.get(i.get('time'))[1][1]+=i.get('snr')
+            transmitions.get(i.get('time'))[1][2]+=i.get('drift')
+    
+            #calculating sum for freq^2, SNR^2 and drift^2
+            transmitions.get(i.get('time'))[1][3]+=i.get('frequency')**2
+            transmitions.get(i.get('time'))[1][4]+=i.get('snr')**2
+            transmitions.get(i.get('time'))[1][5]+=i.get('drift')**2
+            
+    #sliding(only actually going through each spot once so still O(N))   
+    numOfSpots = 0
+    left = 0
+    right = 0
+    slidingWindow = [0,0,0,0,0,0]#sum:freq,snr,drift,sum:freq^2,snr^2,drift^2
+    for t in range(0, len(transmitions.items())):
+        if datetime.datetime.strptime(list(transmitions.keys())[t], '%Y-%m-%d %H:%M:%S') - ts < MR:#
+            slidingWindow[0] += transmitions.get(list(transmitions.keys())[t])[1][0]
+            slidingWindow[1] += transmitions.get(list(transmitions.keys())[t])[1][1]
+            slidingWindow[2] += transmitions.get(list(transmitions.keys())[t])[1][2]
+            slidingWindow[3] += transmitions.get(list(transmitions.keys())[t])[1][3]
+            slidingWindow[4] += transmitions.get(list(transmitions.keys())[t])[1][4]
+            slidingWindow[5] += transmitions.get(list(transmitions.keys())[t])[1][5]
+            numOfSpots += len(transmitions.get(list(transmitions.keys())[t])[0])
+            right = t+1
+            
+        elif te - datetime.datetime.strptime(list(transmitions.keys())[t], '%Y-%m-%d %H:%M:%S') < MR:
+            break
+        else:
+            print (left,right)
+            for j in  range(left, t+1):
+                if datetime.datetime.strptime(list(transmitions.keys())[t], '%Y-%m-%d %H:%M:%S') - datetime.datetime.strptime(list(transmitions.keys())[t], '%Y-%m-%d %H:%M:%S') > MR:
+                    slidingWindow[0] -= transmitions.get(list(transmitions.keys())[t])[1][0]
+                    slidingWindow[1] -= transmitions.get(list(transmitions.keys())[t])[1][1]
+                    slidingWindow[2] -= transmitions.get(list(transmitions.keys())[t])[1][2]
+                    slidingWindow[3] -= transmitions.get(list(transmitions.keys())[t])[1][3]
+                    slidingWindow[4] -= transmitions.get(list(transmitions.keys())[t])[1][4]
+                    slidingWindow[5] -= transmitions.get(list(transmitions.keys())[t])[1][5]
+                    numOfSpots -= len(transmitions.get(list(transmitions.keys())[t])[0])
+                else:
+                    left = j
+                    break
+            for j in  range(right, len(transmitions.get(list(transmitions.keys())[t]))):
+                if datetime.datetime.strptime(list(transmitions.keys())[t], '%Y-%m-%d %H:%M:%S') - datetime.datetime.strptime(list(transmitions.keys())[t], '%Y-%m-%d %H:%M:%S') < MR:
+                    slidingWindow[0] += transmitions.get(list(transmitions.keys())[t])[1][0]
+                    slidingWindow[1] += transmitions.get(list(transmitions.keys())[t])[1][1]
+                    slidingWindow[2] += transmitions.get(list(transmitions.keys())[t])[1][2]
+                    slidingWindow[3] += transmitions.get(list(transmitions.keys())[t])[1][3]
+                    slidingWindow[4] += transmitions.get(list(transmitions.keys())[t])[1][4]
+                    slidingWindow[5] += transmitions.get(list(transmitions.keys())[t])[1][5]
+                    numOfSpots += len(transmitions.get(list(transmitions.keys())[t])[0])
+                else:
+                    right = j
+                    break
+            #mean
+            transmitions.get(list(transmitions.keys())[t])[1][6] = slidingWindow[0]/numOfSpots
+            transmitions.get(list(transmitions.keys())[t])[1][7] = slidingWindow[1]/numOfSpots
+            transmitions.get(list(transmitions.keys())[t])[1][8] = slidingWindow[2]/numOfSpots
+            #SD
+            transmitions.get(list(transmitions.keys())[t])[1][9] = SD(slidingWindow[3],slidingWindow[0]/numOfSpots,numOfSpots)
+            transmitions.get(list(transmitions.keys())[t])[1][10] = SD(slidingWindow[4],slidingWindow[1]/numOfSpots,numOfSpots)
+            transmitions.get(list(transmitions.keys())[t])[1][11] = SD(slidingWindow[5],slidingWindow[2]/numOfSpots,numOfSpots)
+
+            #numofspots
+            transmitions.get(list(transmitions.keys())[t])[1][12] = numOfSpots
+            #sliding window
+            transmitions.get(list(transmitions.keys())[t])[1][13] = copy.deepcopy(slidingWindow)
+    
+    #calculating standard score and detecting abnormallies
+    for t in transmitions.items():
+        for i in range(0,len(t[1][0])):
+            if t[1][1][6] != None and t[1][1][7] != None and t[1][1][8] != None and t[1][1][9] != None and t[1][1][10] != None and t[1][1][11] != None:
+                transmitions.get(t[0])[0][i][4] = ss(t[1][0][i][1],t[1][1][6],t[1][1][9])
+                transmitions.get(t[0])[0][i][5] = ss(t[1][0][i][2],t[1][1][7],t[1][1][10])
+                transmitions.get(t[0])[0][i][6] = ss(t[1][0][i][3],t[1][1][8],t[1][1][11])
+
+    #data.append({'time': i['time'], 'band': i['band'], 'frequency': i['frequency'], 'snr': i['snr'], 'drift':i['drift'], 'mean':0, 'SD':0, 'SS':0})
+    
+    #data = sorted(data, key=lambda d: d['time'])
+    
+    #calculate 
+    
+    
+    #print to CSV
+    #with open('wspr.csv', 'w', newline='') as csvfile:
+     #   fieldnames = ['time', 'band', 'frequency', 'snr', 'drift']
+      #  writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+       # writer.writeheader()
+        #writer.writerows(data)
+    print (transmitions)       
         
-one_pair(MR,'2024-09-01 00:00:00', '2024-10-01 00:00:00', 'KJ6MKI', 'W6LPM')
+#one_pair(MR, datetime.datetime(2024,9,1,0,0,0), datetime.datetime(2024,10,1,0,0,0), 'KJ6MKI', 'W6LPM')
+all_spots(MR,ts,te)    
+
+#one_pair(MR, ts, te, 'KJ6MKI', 'W6LPM')    
         
 
                     
