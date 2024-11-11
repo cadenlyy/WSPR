@@ -6,8 +6,8 @@ import csv
 
 
 
-s = datetime.datetime(2024,7,24,9,0,0) #yyyy,mm,
-e = datetime.datetime(2024,7,24,10,0,0)
+s = datetime.datetime(2024,9,1,0,0,0) #yyyy,mm,
+e = datetime.datetime(2024,9,3,0,0,0)
 
 
 def roundEvenDateTime(a): #YYYY-MM-DD HH:MM:SS
@@ -145,8 +145,8 @@ def all_spots(MR,ts,te):
 def one_pair(MR,ts,te,rx,tx):
     #wspr query
     #colums, database, start dateTime, end dateTime, rx_sign = None, tx_sign = None limit = None
-    #q = query.wsprlive_get("*", "rx", str(ts), str(te), rx, tx)
-    q = [{'id': '8100420947', 'time': '2024-07-24 09:26:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 1, 'power': 23, 'snr': 1, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'id': '8100420947', 'time': '2024-07-24 09:26:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 2, 'power': 23, 'snr': -7, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'id': '8100420947', 'time': '2024-07-24 09:28:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 1000000000000000000000000, 'power': 23, 'snr': 3, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'id': '8100420947', 'time': '2024-07-24 09:30:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 4, 'power': 23, 'snr': -10, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1}]
+    q = query.wsprlive_get("*", "rx", str(ts), str(te), rx, tx)
+    #q = [{'id': '8100420947', 'time': '2024-07-24 09:26:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 1, 'power': 23, 'snr': 1, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'id': '8100420947', 'time': '2024-07-24 09:26:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 2, 'power': 23, 'snr': -7, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'id': '8100420947', 'time': '2024-07-24 09:28:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 1000000000000000000000000, 'power': 23, 'snr': 3, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'id': '8100420947', 'time': '2024-07-24 09:30:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 4, 'power': 23, 'snr': -10, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1}]
     print("wspr.rx query successful") #check if proccessing is slow
     
     #id, time, band, rx_sign, rx_lat, rx_lon, rx_loc, tx_sign, tx_lat, tx_lon, tx_loc, distance, azimuth, rx_azimuth, *frequency, power, *snr, *drift, version, code
@@ -218,7 +218,6 @@ def one_pair(MR,ts,te,rx,tx):
                     right = j
                     break
             #mean
-            print(slidingWindow[0]/numOfSpots)
             transmitions.get(list(transmitions.keys())[t])[1][6] = slidingWindow[0]/numOfSpots
             transmitions.get(list(transmitions.keys())[t])[1][7] = slidingWindow[1]/numOfSpots
             transmitions.get(list(transmitions.keys())[t])[1][8] = slidingWindow[2]/numOfSpots
@@ -239,28 +238,26 @@ def one_pair(MR,ts,te,rx,tx):
                 transmitions.get(t[0])[0][i][4] = ss(t[1][0][i][1],t[1][1][6],t[1][1][9])
                 transmitions.get(t[0])[0][i][5] = ss(t[1][0][i][2],t[1][1][7],t[1][1][10])
                 transmitions.get(t[0])[0][i][6] = ss(t[1][0][i][3],t[1][1][8],t[1][1][11])
-
-                
-
-    #data.append({'time': i['time'], 'band': i['band'], 'frequency': i['frequency'], 'snr': i['snr'], 'drift':i['drift'], 'mean':0, 'SD':0, 'SS':0})
     
-    #data = sorted(data, key=lambda d: d['time'])
+    for i in transmitions.keys():
+        for j in transmitions[i][0]:
+            data.append({'time': i, 'band': j[0], 'frequency': j[1], 'snr': j[2], 'drift':j[3], 'SS:freq':j[4], 'SS:snr':j[5], 'SS:drift':j[6]})
     
-    #calculate 
-    
+    data = sorted(data, key=lambda d: d['time'])
     
     #print to CSV
-    #with open('wspr.csv', 'w', newline='') as csvfile:
-     #   fieldnames = ['time', 'band', 'frequency', 'snr', 'drift']
-      #  writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-       # writer.writeheader()
-        #writer.writerows(data)
-    print (transmitions)       
+    with open(rx+'_'+tx+'_'+ts.strftime("%Y_%m_%d_%H_%M_%S")+'_'+te.strftime("%Y_%m_%d_%H_%M_%S")+'.csv', 'w', newline='') as csvfile:
+        fieldnames = ['time', 'band', 'frequency', 'snr', 'drift', 'SS:freq', 'SS:snr', 'SS:drift']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(data)
         
-one_pair(MR, datetime.datetime(2024,7,24,9,26,0), datetime.datetime(2024,7,24,9,30,0), 'KJ6MKI', 'W6LPM')
+    #print (transmitions)       
+        
+#one_pair(MR, datetime.datetime(2024,7,24,9,26,0), datetime.datetime(2024,7,24,9,30,0), 'KJ6MKI', 'W6LPM')
 #all_spots(MR,datetime.datetime(2024,7,24,9,26,0), datetime.datetime(2024,7,24,9,30,0))    
 
-#one_pair(MR, ts, te, 'KJ6MKI', 'W6LPM')    
+one_pair(MR, s, e, 'KJ6MKI', 'W6LPM')    
         
 
                     
