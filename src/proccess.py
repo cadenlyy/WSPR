@@ -6,8 +6,8 @@ import csv
 
 
 
-ts = datetime.datetime(2024,7,24,9,0,0)
-te = datetime.datetime(2024,7,24,10,0,0)
+s = datetime.datetime(2024,7,24,9,0,0) #yyyy,mm,
+e = datetime.datetime(2024,7,24,10,0,0)
 
 
 def roundEvenDateTime(a): #YYYY-MM-DD HH:MM:SS
@@ -25,7 +25,7 @@ def ss(v, m, sd):
     else:
         return 0
 
-MR = datetime.timedelta(minutes = 10)
+MR = datetime.timedelta(minutes = 2)
 
 def all_spots(MR,ts,te):
     #wspr query
@@ -193,32 +193,32 @@ def one_pair(MR,ts,te,rx,tx):
         elif te - datetime.datetime.strptime(list(transmitions.keys())[t], '%Y-%m-%d %H:%M:%S') < MR:
             break
         else:
-            print (left,right)
             for j in  range(left, t+1):
-                if datetime.datetime.strptime(list(transmitions.keys())[t], '%Y-%m-%d %H:%M:%S') - datetime.datetime.strptime(list(transmitions.keys())[t], '%Y-%m-%d %H:%M:%S') > MR:
-                    slidingWindow[0] -= transmitions.get(list(transmitions.keys())[t])[1][0]
-                    slidingWindow[1] -= transmitions.get(list(transmitions.keys())[t])[1][1]
-                    slidingWindow[2] -= transmitions.get(list(transmitions.keys())[t])[1][2]
-                    slidingWindow[3] -= transmitions.get(list(transmitions.keys())[t])[1][3]
-                    slidingWindow[4] -= transmitions.get(list(transmitions.keys())[t])[1][4]
-                    slidingWindow[5] -= transmitions.get(list(transmitions.keys())[t])[1][5]
+                if datetime.datetime.strptime(list(transmitions.keys())[t], '%Y-%m-%d %H:%M:%S') - datetime.datetime.strptime(list(transmitions.keys())[j], '%Y-%m-%d %H:%M:%S') > MR:
+                    slidingWindow[0] -= transmitions.get(list(transmitions.keys())[j])[1][0]
+                    slidingWindow[1] -= transmitions.get(list(transmitions.keys())[j])[1][1]
+                    slidingWindow[2] -= transmitions.get(list(transmitions.keys())[j])[1][2]
+                    slidingWindow[3] -= transmitions.get(list(transmitions.keys())[j])[1][3]
+                    slidingWindow[4] -= transmitions.get(list(transmitions.keys())[j])[1][4]
+                    slidingWindow[5] -= transmitions.get(list(transmitions.keys())[j])[1][5]
                     numOfSpots -= len(transmitions.get(list(transmitions.keys())[t])[0])
                 else:
                     left = j
                     break
-            for j in  range(right, len(transmitions.get(list(transmitions.keys())[t]))):
-                if datetime.datetime.strptime(list(transmitions.keys())[t], '%Y-%m-%d %H:%M:%S') - datetime.datetime.strptime(list(transmitions.keys())[t], '%Y-%m-%d %H:%M:%S') < MR:
-                    slidingWindow[0] += transmitions.get(list(transmitions.keys())[t])[1][0]
-                    slidingWindow[1] += transmitions.get(list(transmitions.keys())[t])[1][1]
-                    slidingWindow[2] += transmitions.get(list(transmitions.keys())[t])[1][2]
-                    slidingWindow[3] += transmitions.get(list(transmitions.keys())[t])[1][3]
-                    slidingWindow[4] += transmitions.get(list(transmitions.keys())[t])[1][4]
-                    slidingWindow[5] += transmitions.get(list(transmitions.keys())[t])[1][5]
+            for j in  range(right, len(transmitions)):
+                if datetime.datetime.strptime(list(transmitions.keys())[t], '%Y-%m-%d %H:%M:%S') - datetime.datetime.strptime(list(transmitions.keys())[j], '%Y-%m-%d %H:%M:%S') <= MR:
+                    slidingWindow[0] += transmitions.get(list(transmitions.keys())[j])[1][0]
+                    slidingWindow[1] += transmitions.get(list(transmitions.keys())[j])[1][1]
+                    slidingWindow[2] += transmitions.get(list(transmitions.keys())[j])[1][2]
+                    slidingWindow[3] += transmitions.get(list(transmitions.keys())[j])[1][3]
+                    slidingWindow[4] += transmitions.get(list(transmitions.keys())[j])[1][4]
+                    slidingWindow[5] += transmitions.get(list(transmitions.keys())[j])[1][5]
                     numOfSpots += len(transmitions.get(list(transmitions.keys())[t])[0])
                 else:
                     right = j
                     break
             #mean
+            print(slidingWindow[0]/numOfSpots)
             transmitions.get(list(transmitions.keys())[t])[1][6] = slidingWindow[0]/numOfSpots
             transmitions.get(list(transmitions.keys())[t])[1][7] = slidingWindow[1]/numOfSpots
             transmitions.get(list(transmitions.keys())[t])[1][8] = slidingWindow[2]/numOfSpots
@@ -240,6 +240,8 @@ def one_pair(MR,ts,te,rx,tx):
                 transmitions.get(t[0])[0][i][5] = ss(t[1][0][i][2],t[1][1][7],t[1][1][10])
                 transmitions.get(t[0])[0][i][6] = ss(t[1][0][i][3],t[1][1][8],t[1][1][11])
 
+                
+
     #data.append({'time': i['time'], 'band': i['band'], 'frequency': i['frequency'], 'snr': i['snr'], 'drift':i['drift'], 'mean':0, 'SD':0, 'SS':0})
     
     #data = sorted(data, key=lambda d: d['time'])
@@ -255,8 +257,8 @@ def one_pair(MR,ts,te,rx,tx):
         #writer.writerows(data)
     print (transmitions)       
         
-#one_pair(MR, datetime.datetime(2024,9,1,0,0,0), datetime.datetime(2024,10,1,0,0,0), 'KJ6MKI', 'W6LPM')
-all_spots(MR,ts,te)    
+one_pair(MR, datetime.datetime(2024,7,24,9,26,0), datetime.datetime(2024,7,24,9,30,0), 'KJ6MKI', 'W6LPM')
+#all_spots(MR,datetime.datetime(2024,7,24,9,26,0), datetime.datetime(2024,7,24,9,30,0))    
 
 #one_pair(MR, ts, te, 'KJ6MKI', 'W6LPM')    
         
