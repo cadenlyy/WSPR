@@ -22,10 +22,17 @@ def SD(s, m, n):#sum of x^2, mean, number of values
 def ss(v, m, sd):
     if sd != 0:
         return (v-m)/sd
-    else:
-        return 0
+    return 0
+    
+def print_csv(t, rx, tx, ts, te, MR, data):
+    filename = t+'_'+rx+'_'+tx+'_'+ts.strftime("%Y-%m-%d_%H-%M-%S")+'_'+te.strftime("%Y-%m-%d_%H-%M-%S")+'_'+str(MR).split(':')[0]+'-'+str(MR).split(':')[1]+'-'+str(MR).split(':')[2]
+    with open('./data/'+filename+'.csv', 'w', newline='') as csvfile:
+        fieldnames = ['time', 'band', 'frequency', 'snr', 'drift', 'SS:freq', 'SS:snr', 'SS:drift']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(data)
 
-MR = datetime.timedelta(minutes = 2)
+MR = datetime.timedelta(minutes = 180)
 
 def all_spots(MR,ts,te):
     #wspr query
@@ -152,6 +159,7 @@ def one_pair(MR,ts,te,rx,tx):
     #id, time, band, rx_sign, rx_lat, rx_lon, rx_loc, tx_sign, tx_lat, tx_lon, tx_loc, distance, azimuth, rx_azimuth, *frequency, power, *snr, *drift, version, code
 
     #extract needed data
+    print(q[0].get('rx_sign'),q[0].get('rx_lat'),q[0].get('rx_lon'),q[0].get('rx_loc'),q[0].get('tx_sign'),q[0].get('tx_lat'),q[0].get('tx_lon'),q[0].get('tx_loc'))
     data = []
     transmitions = {}
     b = q[0].get('band')
@@ -244,13 +252,8 @@ def one_pair(MR,ts,te,rx,tx):
             data.append({'time': i, 'band': j[0], 'frequency': j[1], 'snr': j[2], 'drift':j[3], 'SS:freq':j[4], 'SS:snr':j[5], 'SS:drift':j[6]})
     
     data = sorted(data, key=lambda d: d['time'])
-    
-    #print to CSV
-    with open(rx+'_'+tx+'_'+ts.strftime("%Y_%m_%d_%H_%M_%S")+'_'+te.strftime("%Y_%m_%d_%H_%M_%S")+'.csv', 'w', newline='') as csvfile:
-        fieldnames = ['time', 'band', 'frequency', 'snr', 'drift', 'SS:freq', 'SS:snr', 'SS:drift']
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        writer.writeheader()
-        writer.writerows(data)
+
+    print_csv('pair',rx,tx,ts,te,MR, data)
         
     #print (transmitions)       
         
