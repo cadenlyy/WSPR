@@ -28,7 +28,7 @@ def wsprlive_get(col, database, ts, te, rx = None, tx = None, l=None):
     q = "SELECT " + col + " FROM " + database + " WHERE time >= '" + ts + "' AND time < '" + te + "'"
 
     if rx != None:
-        q + " AND rx_sign = '" + rx + "'"
+        q += " AND rx_sign = '" + rx + "'"
     if tx != None:
         q += " AND tx_sign = '" + tx + "'"
     if l != None:
