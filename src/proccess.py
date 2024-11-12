@@ -5,9 +5,8 @@ import math
 import csv
 
 
-
-s = datetime.datetime(2024,9,1,0,0,0) #yyyy,mm,
-e = datetime.datetime(2024,9,3,0,0,0)
+s = datetime.datetime(2024,8,31,0,0,0) #yyyy,mm,
+e = datetime.datetime(2024,9,30,0,0,0)
 
 
 def roundEvenDateTime(a): #YYYY-MM-DD HH:MM:SS
@@ -168,7 +167,6 @@ def one_pair(MR,ts,te,rx,tx):
             #adding new time
             if transmitions.get(i.get('time')) == None:
                 transmitions.update({i.get('time'):[[],[0,0,0,0,0,0,None,None,None,None,None,None,None,[]]]})#[sum:freq,snr,drift,sum:freq^2,snr^2,drift^2,mean:freq,snr,drift,SD:freq,snr,drift,numOfSpots,sliding window]
-            
             #pushing in new data  
             transmitions.get(i.get('time'))[0].append([i.get('band'),i.get('frequency'),i.get('snr'),i.get('drift'),0,0,0])#SS: freq, snr, drfit
             
@@ -253,14 +251,23 @@ def one_pair(MR,ts,te,rx,tx):
     
     data = sorted(data, key=lambda d: d['time'])
 
+    
+    #print anomallies
+    sst = 2.0
+    for i in data:
+        if abs(i.get('SS:freq')) >= sst or abs(i.get('SS:snr')) >= sst or abs(i.get('SS:drift')) >= sst:
+            print(i)
+    
     print_csv('pair',rx,tx,ts,te,MR, data)
-        
+    
+    #
+    
     #print (transmitions)       
         
 #one_pair(MR, datetime.datetime(2024,7,24,9,26,0), datetime.datetime(2024,7,24,9,30,0), 'KJ6MKI', 'W6LPM')
 #all_spots(MR,datetime.datetime(2024,7,24,9,26,0), datetime.datetime(2024,7,24,9,30,0))    
 
-one_pair(MR, s, e, 'KJ6MKI', 'W6LPM')    
+one_pair(MR, s, e, 'KL3RR', 'WF1A')    
         
 
                     

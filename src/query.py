@@ -26,16 +26,16 @@ import json
 def wsprlive_get(col, database, ts, te, rx = None, tx = None, l=None):
     # put together the request url
     q = "SELECT " + col + " FROM " + database + " WHERE time >= '" + ts + "' AND time < '" + te + "'"
-
+    
     if rx != None:
-        q += " AND rx_sign = '" + rx + "'"
+        q += " AND rx_sign == '" + rx + "'"
     if tx != None:
-        q += " AND tx_sign = '" + tx + "'"
+        q += " AND tx_sign == '" + tx + "'"
     if l != None:
         q += " Limit " + str(l)
-
+        
     url = "https://db1.wspr.live/?query=" + urllib.parse.quote_plus(q + " FORMAT JSON")
-
+      
     # download contents from wspr.live
     contents = urllib.request.urlopen(url).read()
 
