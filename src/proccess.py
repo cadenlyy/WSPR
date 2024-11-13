@@ -4,11 +4,6 @@ import datetime
 import math
 import csv
 
-
-s = datetime.datetime(2024,9,1,0,0,0) #Y,M,D,h,m,s
-e = datetime.datetime(2024,9,3,23,59,59)
-
-
 def roundEvenDateTime(a): #YYYY-MM-DD HH:MM:SS
     return datetime.datetime.strptime(str(a)[:15]+str(int(str(a)[15])%2+int(str(a)[15]))+str(a)[16:], '%Y-%m-%d %H:%M:%S')
 
@@ -30,8 +25,6 @@ def print_csv(t, rx, tx, ts, te, MR, data):
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(data)
-
-MR = datetime.timedelta(minutes = 180)
 
 def all_spots(MR,ts,te):
     #wspr query
@@ -183,12 +176,14 @@ def one_pair(MR,ts,te,rx,tx):
     transmitions = dict(sorted(transmitions.items()))
             
     #sliding(only actually going through each spot once so still O(N))   
-    numOfSpots = 0
+    numOfSpots = 1
     left = 0
     right = 0
+    ft = list(transmitions)[0]
+    lt = list(transmitions)[-1]
     slidingWindow = [0,0,0,0,0,0]#sum:freq,snr,drift,sum:freq^2,snr^2,drift^2
     for t in range(0, len(transmitions.items())):
-        if datetime.datetime.strptime(list(transmitions.keys())[t], '%Y-%m-%d %H:%M:%S') - ts < MR:#
+        if datetime.datetime.strptime(list(transmitions.keys())[t], '%Y-%m-%d %H:%M:%S') - datetime.datetime.strptime(ft, '%Y-%m-%d %H:%M:%S') < MR:#
             slidingWindow[0] += transmitions.get(list(transmitions.keys())[t])[1][0]
             slidingWindow[1] += transmitions.get(list(transmitions.keys())[t])[1][1]
             slidingWindow[2] += transmitions.get(list(transmitions.keys())[t])[1][2]
@@ -199,7 +194,7 @@ def one_pair(MR,ts,te,rx,tx):
             right = t+1
             
             
-        elif te - datetime.datetime.strptime(list(transmitions.keys())[t], '%Y-%m-%d %H:%M:%S') < MR:
+        elif datetime.datetime.strptime(lt, '%Y-%m-%d %H:%M:%S') - datetime.datetime.strptime(list(transmitions.keys())[t], '%Y-%m-%d %H:%M:%S') < MR:
             break
         else:
             for j in  range(left, t+1):
@@ -268,15 +263,20 @@ def one_pair(MR,ts,te,rx,tx):
     
     print_csv('pair',rx,tx,ts,te,MR, data)
     
-    #
+    
     
     #print (transmitions)       
-        
-#one_pair(MR, datetime.datetime(2024,7,24,9,26,0), datetime.datetime(2024,7,24,9,30,0), 'KJ6MKI', 'W6LPM')
-#all_spots(MR,datetime.datetime(2024,7,24,9,26,0), datetime.datetime(2024,7,24,9,30,0))    
+    
 
-one_pair(MR, s, e, 'KL3RR', 'WF1A')    
-        
+s = datetime.datetime(2024,8,31,0,0,0) #Y,M,D,h,m,s
+e = datetime.datetime(2024,9,30,0,0,0)
+MR = datetime.timedelta(minutes = 180)
+
+#pair_DO4ZT_2E0DLC_2024-08-31_00-00-00_2024-09-30_00-00-00_3-00-00
+one_pair(MR, s, e, 'DO4ZT', '2E0DLC')    
+
+#one_pair(MR, datetime.datetime(2024,7,24,9,26,0), datetime.datetime(2024,7,24,9,30,0), 'KJ6MKI', 'W6LPM')
+#all_spots(MR,datetime.datetime(2024,7,24,9,26,0), datetime.datetime(2024,7,24,9,30,0))
 
                     
 
