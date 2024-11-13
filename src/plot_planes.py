@@ -1,12 +1,52 @@
+from mpl_toolkits.basemap import Basemap
 import matplotlib.pyplot as plt
-#import adsb_2024_9_1_153800 as data
+import numpy as np
+import math
+import proccess
+import datetime
 
-#points = data.d.get('aircraft')
-lon = [-156.24373,-155.74309,-154.59226,-154.99647,-155.03055,-155.74309,-155.39303,-154.27704,-152.75628,-152.82033,-141.01744,-160.20577,-158.12743,-153.29393,-143.89013,-146.65128,-151.20132,-149.8412]
-lat = [22.5214,22.36971,21.23173,19.96724,19.72147,22.36971,24.19889,27.31025,28.69507,26.92797,43.41007,44.02549,44.89581,49.43989,58.74793,60.37248,60.58022,60.9957]
+class plane:
+    lat = 0
+    lon = 0
+    heading = 0
+    ac = [0,0,0,0]
+    def __init__(self,lat,lon,heading):
+        self.lat = lat
+        self.lon = lon
+        self.heading = heading
+        self.ac = [lon,lat,lon-1,lat-math.tan(heading*math.pi/180)]
+    def plot(self):
+        plt.annotate('', xy=(map(self.ac[0],self.ac[1])), xytext=(map(self.ac[2],self.ac[3])),arrowprops=dict(arrowstyle="->"))
 
-crx = [-149.958, 61.146] #lon, lat
-ctx = [-155.04, 19.4792]
+
+map = Basemap(projection='cyl',llcrnrlat=0,urcrnrlat=75,
+            llcrnrlon=-180,urcrnrlon=-100,resolution='c')
+
+map.drawcoastlines(linewidth=0.25)
+map.drawcountries(linewidth=0.25)
+map.fillcontinents()
+
+map.drawmapboundary()
+
+map.drawmeridians(np.arange(0,360,30))
+map.drawparallels(np.arange(-90,90,30))
+
+#aircraft
+one = plane(48.84321,-148.64913,129)
+lon = [-148.64913,-150.25799,-148.61223]
+lat = [48.84321,51.01763,60.38938]
+
+#spots
+s = datetime.datetime(2024,9,1,0,0,0) #Y,M,D,h,m,s
+e = datetime.datetime(2024,9,30,23,59,59)
+MR = datetime.timedelta(minutes = 180)
+
+t = proccess.all_spots(MR,s,e)
+crx1 = [-149.958, 61.146] #lon, lat
+ctx1 = [-155.04, 19.4792]
+
+crx2 = [-149.958, 61.146]
+ctx2 = [-123.042, 49.479]
 
 #for i in points:
 #    if i.get('lat') != None:
@@ -15,11 +55,13 @@ ctx = [-155.04, 19.4792]
 #    if (abs(a-crx[0]) < abs(crx[0]-ctx[0]) or abs(a-ctx[0]) < abs(crx[0]-ctx[0])) and (abs(b-crx[1]) < abs(crx[1]-ctx[1]) or abs(b-ctx[1]) < abs(crx[1]-ctx[1])): 
 #        lon.append(a)
 #        lat.append(b)
-    
-plt.figure(figsize=(10,6))
 
-plt.scatter(lon, lat, linewidths=1)
-plt.plot([crx[0], ctx[0]], [crx[1], ctx[1]], c= "red")
+x, y = map(one.ac[0],one.ac[1])
+x2, y2 = map(one.ac[2],one.ac[3])
 
-plt.title("2024-08-31  6:38:00")
+one.plot()
+map.drawgreatcircle(ctx1[0], ctx1[1], crx1[0], crx1[1],  c = "red")
+#plt.plot([crx2[0], ctx2[0]], [crx2[1], ctx2[1]], c= "red")
+
+plt.title("2024-09-03 05:46:00")
 
