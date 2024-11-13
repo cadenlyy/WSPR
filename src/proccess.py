@@ -5,8 +5,8 @@ import math
 import csv
 
 
-s = datetime.datetime(2024,8,31,0,0,0) #yyyy,mm,
-e = datetime.datetime(2024,9,30,0,0,0)
+s = datetime.datetime(2024,9,1,0,0,0) #Y,M,D,h,m,s
+e = datetime.datetime(2024,9,3,23,59,59)
 
 
 def roundEvenDateTime(a): #YYYY-MM-DD HH:MM:SS
@@ -26,7 +26,7 @@ def ss(v, m, sd):
 def print_csv(t, rx, tx, ts, te, MR, data):
     filename = t+'_'+rx+'_'+tx+'_'+ts.strftime("%Y-%m-%d_%H-%M-%S")+'_'+te.strftime("%Y-%m-%d_%H-%M-%S")+'_'+str(MR).split(':')[0]+'-'+str(MR).split(':')[1]+'-'+str(MR).split(':')[2]
     with open('./data/'+filename+'.csv', 'w', newline='') as csvfile:
-        fieldnames = ['time', 'band', 'frequency', 'snr', 'drift', 'SS:freq', 'SS:snr', 'SS:drift']
+        fieldnames = ['time', 'band', 'frequency', 'snr', 'drift', 'SS:freq', 'SS:snr', 'SS:drift', 'Numofspots']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(data)
@@ -179,6 +179,8 @@ def one_pair(MR,ts,te,rx,tx):
             transmitions.get(i.get('time'))[1][3]+=i.get('frequency')**2
             transmitions.get(i.get('time'))[1][4]+=i.get('snr')**2
             transmitions.get(i.get('time'))[1][5]+=i.get('drift')**2
+    
+    transmitions = dict(sorted(transmitions.items()))
             
     #sliding(only actually going through each spot once so still O(N))   
     numOfSpots = 0
@@ -196,6 +198,7 @@ def one_pair(MR,ts,te,rx,tx):
             numOfSpots += len(transmitions.get(list(transmitions.keys())[t])[0])
             right = t+1
             
+            
         elif te - datetime.datetime.strptime(list(transmitions.keys())[t], '%Y-%m-%d %H:%M:%S') < MR:
             break
         else:
@@ -208,11 +211,13 @@ def one_pair(MR,ts,te,rx,tx):
                     slidingWindow[4] -= transmitions.get(list(transmitions.keys())[j])[1][4]
                     slidingWindow[5] -= transmitions.get(list(transmitions.keys())[j])[1][5]
                     numOfSpots -= len(transmitions.get(list(transmitions.keys())[t])[0])
+                    print(-len(transmitions.get(list(transmitions.keys())[t])[0]))
                 else:
                     left = j
                     break
-            for j in  range(right, len(transmitions)):
-                if datetime.datetime.strptime(list(transmitions.keys())[t], '%Y-%m-%d %H:%M:%S') - datetime.datetime.strptime(list(transmitions.keys())[j], '%Y-%m-%d %H:%M:%S') <= MR:
+            for j in  range(right, len(transmitions.items())):
+                #print(datetime.datetime.strptime(list(transmitions.keys())[j], '%Y-%m-%d %H:%M:%S') - datetime.datetime.strptime(list(transmitions.keys())[t], '%Y-%m-%d %H:%M:%S'))
+                if datetime.datetime.strptime(list(transmitions.keys())[j], '%Y-%m-%d %H:%M:%S') - datetime.datetime.strptime(list(transmitions.keys())[t], '%Y-%m-%d %H:%M:%S') <= MR and j != len(transmitions.items())-1:
                     slidingWindow[0] += transmitions.get(list(transmitions.keys())[j])[1][0]
                     slidingWindow[1] += transmitions.get(list(transmitions.keys())[j])[1][1]
                     slidingWindow[2] += transmitions.get(list(transmitions.keys())[j])[1][2]
@@ -220,9 +225,12 @@ def one_pair(MR,ts,te,rx,tx):
                     slidingWindow[4] += transmitions.get(list(transmitions.keys())[j])[1][4]
                     slidingWindow[5] += transmitions.get(list(transmitions.keys())[j])[1][5]
                     numOfSpots += len(transmitions.get(list(transmitions.keys())[t])[0])
+                    print(len(transmitions.get(list(transmitions.keys())[t])[0]))
                 else:
                     right = j
                     break
+            print(numOfSpots)
+            print('')
             #mean
             transmitions.get(list(transmitions.keys())[t])[1][6] = slidingWindow[0]/numOfSpots
             transmitions.get(list(transmitions.keys())[t])[1][7] = slidingWindow[1]/numOfSpots
@@ -246,17 +254,17 @@ def one_pair(MR,ts,te,rx,tx):
                 transmitions.get(t[0])[0][i][6] = ss(t[1][0][i][3],t[1][1][8],t[1][1][11])
     
     for i in transmitions.keys():
-        for j in transmitions[i][0]:
-            data.append({'time': i, 'band': j[0], 'frequency': j[1], 'snr': j[2], 'drift':j[3], 'SS:freq':j[4], 'SS:snr':j[5], 'SS:drift':j[6]})
+        for j in transmitions.get(i)[0]:
+            data.append({'time': i, 'band': j[0], 'frequency': j[1], 'snr': j[2], 'drift':j[3], 'SS:freq':j[4], 'SS:snr':j[5], 'SS:drift':j[6], 'Numofspots':transmitions.get(i)[1][12]})
     
-    data = sorted(data, key=lambda d: d['time'])
+    
 
     
     #print anomallies
-    sst = 2.0
-    for i in data:
-        if abs(i.get('SS:freq')) >= sst or abs(i.get('SS:snr')) >= sst or abs(i.get('SS:drift')) >= sst:
-            print(i)
+    #sst = 2.0
+    #for i in data:
+        #if abs(i.get('SS:freq')) >= sst or abs(i.get('SS:snr')) >= sst or abs(i.get('SS:drift')) >= sst:
+            #print(i)
     
     print_csv('pair',rx,tx,ts,te,MR, data)
     
