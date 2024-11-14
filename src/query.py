@@ -44,4 +44,4 @@ def wsprlive_get(col, database, ts, te, rx = None, tx = None, l=None):
 
 #test
 if __name__ == "__main__":
-    print(wsprlive_get("*", "rx", '2024-10-01 16:14:00', '2024-10-01 16:16:00', '01230', '0TXWN0'))
+    print(wsprlive_get("*", "rx", '2024-09-01 00:00:00', '2024-09-01 07:00:00'))

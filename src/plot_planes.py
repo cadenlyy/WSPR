@@ -2,8 +2,9 @@ from mpl_toolkits.basemap import Basemap
 import matplotlib.pyplot as plt
 import numpy as np
 import math
-import proccess
+import process
 import datetime
+import time
 
 class plane:
     lat = 0
@@ -19,8 +20,8 @@ class plane:
         plt.annotate('', xy=(map(self.ac[0],self.ac[1])), xytext=(map(self.ac[2],self.ac[3])),arrowprops=dict(arrowstyle="->"))
 
 
-map = Basemap(projection='cyl',llcrnrlat=0,urcrnrlat=75,
-            llcrnrlon=-180,urcrnrlon=-100,resolution='c')
+map = Basemap(projection='cyl',llcrnrlat=-90,urcrnrlat=90,
+            llcrnrlon=-180,urcrnrlon=180,resolution='c')
 
 map.drawcoastlines(linewidth=0.25)
 map.drawcountries(linewidth=0.25)
@@ -38,15 +39,11 @@ lat = [48.84321,51.01763,60.38938]
 
 #spots
 s = datetime.datetime(2024,9,1,0,0,0) #Y,M,D,h,m,s
-e = datetime.datetime(2024,9,30,23,59,59)
+e = datetime.datetime(2024,9,1,10,0,0)
 MR = datetime.timedelta(minutes = 180)
 
-t = proccess.all_spots(MR,s,e)
-crx1 = [-149.958, 61.146] #lon, lat
-ctx1 = [-155.04, 19.4792]
-
-crx2 = [-149.958, 61.146]
-ctx2 = [-123.042, 49.479]
+t = process.all_spots(MR,s,e)
+#print(t)
 
 #for i in points:
 #    if i.get('lat') != None:
@@ -60,8 +57,14 @@ x, y = map(one.ac[0],one.ac[1])
 x2, y2 = map(one.ac[2],one.ac[3])
 
 one.plot()
-map.drawgreatcircle(ctx1[0], ctx1[1], crx1[0], crx1[1],  c = "red")
-#plt.plot([crx2[0], ctx2[0]], [crx2[1], ctx2[1]], c= "red")
+
+#plot abnormallies
+for i in t:
+    if(int(i[8]) != int(i[12])+1 and int(i[8]) != int(i[12])-1 and int(i[8]) != int(i[12])):
+        print(int(i[8]), int(i[7]), int(i[12]), int(i[11]))
+        map.drawgreatcircle(i[8], i[7], i[12], i[11],  linewidth = 0.01, c = "red")
 
 plt.title("2024-09-03 05:46:00")
+
+print(time.process_time())
 

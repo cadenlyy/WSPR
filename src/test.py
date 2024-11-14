@@ -1,27 +1,12 @@
-from mpl_toolkits.basemap import Basemap
-import matplotlib.pyplot as plt
+import process
+import datetime
 
+s = datetime.datetime(2024,9,1,0,0,0) #Y,M,D,h,m,s
+e = datetime.datetime(2024,9,1,0,0,1)
+MR = datetime.timedelta(minutes = 180)
 
-map = Basemap(projection='ortho', 
-              lat_0=0, lon_0=0)
+#pair_KL3RR_WF1A_2024-09-01_00-00-00_2024-09-03_23-59-59_3-00-00
+#one_pair(MR, s, e, 'KL3RR', 'VE7AHT')    
 
-map.drawmapboundary(fill_color='aqua')
-map.fillcontinents(color='coral',lake_color='aqua')
-map.drawcoastlines()
-
-
-x, y = map(2, 41)
-x2, y2 = (-90, 10)
-
-plt.annotate('Barcelona', xy=(x, y),  xycoords='data',
-                xytext=(x2, y2), textcoords='offset points',
-                color='r',
-                arrowprops=dict(arrowstyle="fancy", color='g')
-                )
-
-x2, y2 = map(0, 0)
-plt.annotate('Barcelona', xy=(x, y),  xycoords='data',
-                xytext=(x2, y2), textcoords='data',
-                arrowprops=dict(arrowstyle="->")
-                )
-plt.show()
+#one_pair(MR, datetime.datetime(2024,7,24,9,26,0), datetime.datetime(2024,7,24,9,30,0), 'KJ6MKI', 'W6LPM')
+process.all_spots(MR, s, e)
