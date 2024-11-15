@@ -4,6 +4,7 @@ import plot_planes
 import check
 import datetime
 
+#processing details
 s = datetime.datetime(2024,9,1,0,0,0) #Y,M,D,h,m,s
 e = datetime.datetime(2024,9,1,0,0,0)
 MR = datetime.timedelta(minutes = 180)

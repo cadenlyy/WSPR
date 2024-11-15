@@ -1,4 +1,3 @@
-import process
 import datetime
 import math
 import numpy as np
@@ -9,7 +8,26 @@ ctx = [-155.04, 19.4792]
 ca = [-148.61223, 60.38938]#lon,lat
 
 #print(ca[1] == ((crx[0]-ctx[0])/(crx[1]-ctx[1]))*(ca[0]-crx[0])+crx[1])
-    
+
+class ordered_list:#list but all items are ordered
+    items = [];
+    def add(self, v, low = 0,high = None, key = lambda a,i: a[i]):
+        if len(self.items) == 0:#check if empty
+            self.items.append(v)
+        if high == None:#check for first recursion
+            high = len(self.items)-1
+        if high >= low:#check if done searching
+            mid = (high + low) // 2
+            if self.items[mid] == v:#check if found same value
+                self.items.insert(mid+1, v)
+            elif key(self.items,mid,v):#check if too high
+                self.add(v, low, mid - 1, key)
+            else:#too low
+                self.add(v, mid + 1, high, key)
+        else:
+            self.items.insert(low, v)
+
+#calculate intersection of greate circles
 def intersect_greatcircle(A, B, C, D):#lat,lon
     
     p1_lat1 = A[0]
@@ -22,13 +40,11 @@ def intersect_greatcircle(A, B, C, D):#lat,lon
     p2_lat2 = D[0]
     p2_long2 = D[1]
 
-    # Convert points in great circle 1, degrees to radians
+    # Convert degrees to radians
     p1_lat1_rad = ((math.pi * p1_lat1) / 180.0)
     p1_long1_rad = ((math.pi * p1_long1) / 180.0)
     p1_lat2_rad = ((math.pi * p1_lat2) / 180.0)
     p1_long2_rad = ((math.pi * p1_long2) / 180.0)
-
-    # Convert points in great circle 2, degrees to radians
     p2_lat1_rad = ((math.pi * p2_lat1) / 180.0)
     p2_long1_rad = ((math.pi * p2_long1) / 180.0)
     p2_lat2_rad = ((math.pi * p2_lat2) / 180.0)
@@ -49,7 +65,6 @@ def intersect_greatcircle(A, B, C, D):#lat,lon
     cz2 = math.sin(p2_lat2_rad)
 
     # Get normal to planes containing great circles
-    # np.cross product of vector to each point from the origin
     N1 = np.cross([x1, y1, z1], [x2, y2, z2])
     N2 = np.cross([cx1, cy1, cz1], [cx2, cy2, cz2])
 
@@ -70,36 +85,17 @@ def intersect_greatcircle(A, B, C, D):#lat,lon
     else:
         print(i_lat2, i_long2)
         
-    print(time.process_time())
+    print(time.process_time())#check process time
         
-def first_node(a):
+def first_node(a):#find higher node in a spot
     if a.get('rx_lat') > a.get('tx_lat'):
         print(time.process_time())
         return a.get('rx_lat')
-    print(time.process_time())
+    print(time.process_time())#check process time
     return a.get('tx_lat')
-
-class ordered_list:
-    items = [];
-    def add(self, v, low = 0,high = None, key = lambda a,i: a[i]):
-        if len(self.items) == 0:
-            self.items.append(v)
-        if high == None:
-            high = len(self.items)-1
-        if len(self.items) == 0:
-            self.items.append(v)
-        elif high >= low:
-            mid = (high + low) // 2
-            if self.items[mid] == v:
-                self.items.insert(mid+1, v)
-            elif key(self.items,mid,v):
-                self.add(v, low, mid - 1, key)
-            else:
-                self.add(v, mid + 1, high, key)
-        else:
-            self.items.insert(low, v)
             
-def comp(arr,a,b):
+def comp(arr,a,b):#comparator or spot data structure
+    #find lower nodes
     if arr[a].get('rx_lat') < arr[a].get('tx_lat'):
         ov = arr[a].get('rx_lat')
     else:
@@ -108,14 +104,13 @@ def comp(arr,a,b):
         nv = b.get('rx_lat')
     else:
         nv = b.get('tx_lat')
-    return ov < nv
+    return ov > nv #return if old node is higher
             
             
-def intersect_point(d):
-    a = sorted(d, key=first_node, reverse=True)
-    print(a)
+def intersect_point(d):#find points of intersection
+    a = sorted(d, key=first_node, reverse=True)#sorting by highest higher node
     o = ordered_list()
-    for i in a:
+    for i in a:#
         if len(o.items) == 0:
             o.add(i, key = comp)
         else:

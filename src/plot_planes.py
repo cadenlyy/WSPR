@@ -6,26 +6,28 @@ import process
 import datetime
 import time
 
-class plane:
+class plane: #maintain the necessary details for each plane
     lat = 0
     lon = 0
     heading = 0
-    ac = [0,0,0,0]
+    ac = [0,0,0,0]#coordinates to plot on map
     def __init__(self,lat,lon,heading):
         self.lat = lat
         self.lon = lon
         self.heading = heading
         self.ac = [lon,lat,lon-1,lat-math.tan(heading*math.pi/180)]
-    def plot(self):
+    def plot(self):#plot arrow on map
         plt.annotate('', xy=(map(self.ac[0],self.ac[1])), xytext=(map(self.ac[2],self.ac[3])),arrowprops=dict(arrowstyle="->"))
 
-def plotgreatcircle_abnomal(t):
+#plot greatcircle for all data points
+def plotgreatcircle_abnomaly(t):
     for i in t:
         if(int(i[8]) != int(i[12])+1 and int(i[8]) != int(i[12])-1 and int(i[8]) != int(i[12])):
             map.drawgreatcircle(i[8], i[7], i[12], i[11],  linewidth = 0.01, c = "red")
     print(time.process_time())
 
-def plot():
+def plot():#draw map and all plots
+    #drawing map
     map = Basemap(projection='cyl',llcrnrlat=-90,urcrnrlat=90,
                 llcrnrlon=-180,urcrnrlon=180,resolution='c')
     
