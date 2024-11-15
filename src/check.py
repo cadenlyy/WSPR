@@ -2,6 +2,7 @@ import datetime
 import math
 import numpy as np
 import time
+import process
 
 crx = [-149.958, 61.146] #lon, lat
 ctx = [-155.04, 19.4792]
@@ -27,6 +28,8 @@ class ordered_list:#list but all items are ordered
                 self.add(v, mid + 1, high, key)
         else:
             self.items.insert(low, v)
+    def pop(self):
+        self.item = self.item[1:]
 
 #calculate intersection of greate circles
 def intersect_greatcircle(A, B, C, D):#lat,lon
@@ -82,14 +85,23 @@ def intersect_greatcircle(A, B, C, D):#lat,lon
 
     # Print results
     if (abs(i_lat1 - p1_lat1) < abs(i_lat2 - p1_lat1)):
-        print (i_lat1, i_long1)
+        print(time.process_time())#check process time
+        return[i_lat1, i_long1]
     else:
-        print(i_lat2, i_long2)
+        print(time.process_time())#check process time
+        return[i_lat2, i_long2]
         
-    print(time.process_time())#check process time
+    
         
 def first_node(a):#find higher node in a spot
     if a.get('rx_lat') > a.get('tx_lat'):
+        print(time.process_time())
+        return a.get('rx_lat')
+    print(time.process_time())#check process time
+    return a.get('tx_lat')
+
+def last_node(a):
+    if a.get('rx_lat') < a.get('tx_lat'):
         print(time.process_time())
         return a.get('rx_lat')
     print(time.process_time())#check process time
@@ -107,13 +119,34 @@ def comp(arr,a,b):#comparator or spot data structure
         nv = b.get('tx_lat')
     return ov < nv #return if old node is higher
             
-            
-def intersect_point(d):#find points of intersection
-    a = sorted(d, key=first_node, reverse=True)#sorting by highest higher node
-    o = ordered_list()
-    for i in a:#
-        o.add(i, key = comp)
-    print(o.items)
+#find points of intersection
+def intersect_point(d):#list of dict with SS_freq, SS_snr,SS_drift,id, time, band, rx_sign, rx_lat, rx_lon, rx_loc, tx_sign, tx_lat, tx_lon, tx_loc, distance, azimuth, rx_azimuth, *frequency, power, *snr, *drift, version, code
+    a = {}    
+    #arranging by time
+    for i in d:
+        #adding new times
+        if a.get(i.get('time')) == None: 
+            a.update({i.get('time'): []})
+        a.get(i.get('time')).append(i)
+        
+    #line sweep for all time stamps
+    p = []
+    for i in a.keys():#time
+        a.get(i).sort(key=first_node, reverse=True)#sorting by highest higher node
+        o = ordered_list()
+        for j in a.get(i):#data
+            for k in o.items:#open data
+                if last_node(k) < first_node(j):#removing closed spots
+                    o.pop()
+                else:
+                    #check for intersections
+                    I = intersect_greatcircle([j.get('rx_lat'),j.get('rx_lon')], [j.get('tx_lat'),j.get('tx_lon')], [k.get('rx_lat'),k.get('rx_lon')], [k.get('tx_lat'),k.get('tx_lon')])
+                    if abs(j.get('rx_lon')-j.get('tx_lon')) > abs(I[1]-j.get('rx_lon')) and abs(j.get('rx_lon')-j.get('tx_lon')) > abs(I[1]-j.get('tx_lon')) and abs(k.get('rx_lon')-k.get('tx_lon')) > abs(I[1]-k.get('rx_lon')) and abs(k.get('rx_lon')-k.get('tx_lon')) > abs(I[1]-k.get('tx_lon')):
+                        #adding new openspot
+                        p.append([i,j,k])
+                    o.add(k,key = comp)
+                    
+                
 
     print(time.process_time())
     
@@ -122,9 +155,9 @@ if __name__ == "__main__":
     
     s = datetime.datetime(2024,9,1,0,0,0) #Y,M,D,h,m,s
     e = datetime.datetime(2024,9,1,0,0,0)
-    MR = datetime.timedelta(minutes = 180)
+    MR = datetime.timedelta(minutes = 2)
     
-    #A = process.anomalies('r', MR, ts, te)
+    A = [{'SS_freq': 1, 'SS_snr': 1, 'SS_drift': 1, 'id': '8100420947', 'time': '2024-07-24 09:26:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 1, 'power': 23, 'snr': 1, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'SS_freq': 1, 'SS_snr': 1, 'SS_drift': 1, 'id': '8100420947', 'time': '2024-07-24 09:26:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 2, 'power': 23, 'snr': -7, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'SS_freq': 1, 'SS_snr': 1, 'SS_drift': 1, 'id': '8100420947', 'time': '2024-07-24 09:28:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 1000000000000000000000000, 'power': 23, 'snr': 3, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'SS_freq': 1, 'SS_snr': 1, 'SS_drift': 1, 'id': '8100420947', 'time': '2024-07-24 09:30:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 4, 'power': 23, 'snr': -10, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1}]
     
-    intersect_point(d)
+    intersect_point(A)
     
