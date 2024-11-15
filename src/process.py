@@ -21,9 +21,17 @@ def ss(v, m, sd):
         return (v-m)/sd
     return 0
     
-def print_csv(t, rx, tx, ts, te, MR, data):
-    base_dir = "C:/Users/Lyiyang1/Desktop/wspr/data"
-    filename = t+'_'+rx+'_'+tx+'_'+ts.strftime("%Y-%m-%d_%H-%M-%S")+'_'+te.strftime("%Y-%m-%d_%H-%M-%S")+'_'+str(MR).split(':')[0]+'-'+str(MR).split(':')[1]+'-'+str(MR).split(':')[2]+'.csv'
+def print_csv(t, ts, te, MR, data, rx = None, tx = None):
+    if rx == None:
+        rx = ''
+    else:
+        rx = '_'+rx
+    if tx == None:
+        tx = ''
+    else:
+        tx = '_'+tx
+    base_dir = "C:/Users/Lyiyang1/Desktop/wspr/data/csv"
+    filename = t+rx+tx+'_'+ts.strftime("%Y-%m-%d_%H-%M-%S")+'_'+te.strftime("%Y-%m-%d_%H-%M-%S")+'_'+str(MR).split(':')[0]+'-'+str(MR).split(':')[1]+'-'+str(MR).split(':')[2]+'.csv'
     abs_file = os.path.join(base_dir, filename)
     with open(abs_file, 'w', newline='') as csvfile:
         fieldnames = ['time', 'band', 'frequency', 'snr', 'drift', 'SS:freq', 'SS:snr', 'SS:drift', 'Numofspots']
@@ -31,7 +39,7 @@ def print_csv(t, rx, tx, ts, te, MR, data):
         writer.writeheader()
         writer.writerows(data)
         
-def print_json(data, ts, te, rx = None, tx = None, l=None):
+def print_json(t, ts, te, MR, data, rx = None, tx = None):
     if rx == None:
         rx = ''
     else:
@@ -40,18 +48,14 @@ def print_json(data, ts, te, rx = None, tx = None, l=None):
         tx = ''
     else:
         tx = '_'+tx
-    if l == None:
-        l = ''
-    else:
-        l = '_'+str(l)
         
-    base_dir = "C:/Users/Lyiyang1/Desktop/wspr"
-    filename = ts.strftime("%Y-%m-%d_%H-%M-%S")+'_'+te.strftime("%Y-%m-%d_%H-%M-%S")+rx+tx+l+'.txt'
+    base_dir = "C:/Users/Lyiyang1/Desktop/wspr/data/json"
+    filename = t+rx+tx+'_'+ts.strftime("%Y-%m-%d_%H-%M-%S")+'_'+te.strftime("%Y-%m-%d_%H-%M-%S")+'_'+str(MR).split(':')[0]+'-'+str(MR).split(':')[1]+'-'+str(MR).split(':')[2]+'.txt'
     abs_file = os.path.join(base_dir, filename)
     with open(abs_file, 'w') as file: 
         file.write(json.dumps(data))
 
-def read_json(ts, te, rx = None, tx = None, l=None):
+def read_json(t, ts, te, MR, rx = None, tx = None):
     if rx == None:
         rx = ''
     else:
@@ -60,12 +64,8 @@ def read_json(ts, te, rx = None, tx = None, l=None):
         tx = ''
     else:
         tx = '_'+tx
-    if l == None:
-        l = ''
-    else:
-        l = '_'+str(l)
-    base_dir = "C:/Users/Lyiyang1/Desktop/wspr"
-    filename = ts.strftime("%Y-%m-%d_%H-%M-%S")+'_'+te.strftime("%Y-%m-%d_%H-%M-%S")+rx+tx+l+'.txt'
+    base_dir = "C:/Users/Lyiyang1/Desktop/wspr/data/json"
+    filename = t+rx+tx+'_'+ts.strftime("%Y-%m-%d_%H-%M-%S")+'_'+te.strftime("%Y-%m-%d_%H-%M-%S")+'_'+str(MR).split(':')[0]+'-'+str(MR).split(':')[1]+'-'+str(MR).split(':')[2]+'.txt'
     abs_file = os.path.join(base_dir, filename)
     print(abs_file)
     with open(abs_file, 'r') as file: 
@@ -75,14 +75,14 @@ def read_json(ts, te, rx = None, tx = None, l=None):
 def all_spots(MR,ts,te):
     #wspr query
     #colums, database, start dateTime, end dateTime, rx_sign = None, tx_sign = None limit = None
-    #q = query.wsprlive_get("*", "rx", str(ts), str(te))
+    q = query.wsprlive_get("*", "rx", str(ts), str(te))
     #q = [{'id': '8100420947', 'time': '2024-07-24 09:26:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 1, 'power': 23, 'snr': 1, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'id': '8100420947', 'time': '2024-07-24 09:26:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 2, 'power': 23, 'snr': -7, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'id': '8100420947', 'time': '2024-07-24 09:28:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 1000000000000000000000000, 'power': 23, 'snr': 3, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'id': '8100420947', 'time': '2024-07-24 09:30:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 4, 'power': 23, 'snr': -10, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1}]
-    print("wspr.rx query successful") #check if proccessing is slow
     
-    #print_json(q, ts, te)
-    q = read_json(ts, te)
-    
+    #print_json('all', ts, te, MR, q)
+    #q = read_json('all', ts, te, MR)
     #print(q)
+    
+    print("wspr.rx query successful") #check if proccessing is slow
     
     #id, time, band, rx_sign, rx_lat, rx_lon, rx_loc, tx_sign, tx_lat, tx_lon, tx_loc, distance, azimuth, rx_azimuth, *frequency, power, *snr, *drift, version, code
 
@@ -317,7 +317,7 @@ def one_pair(MR,ts,te,rx,tx):
         if abs(i.get('SS:freq')) >= sst or abs(i.get('SS:snr')) >= sst or abs(i.get('SS:drift')) >= sst:
             print(i)
     
-    print_csv('pair',rx,tx,ts,te,MR, data)
+    print_csv('pair',ts,te,MR, data,rx,tx)
     
     
     
