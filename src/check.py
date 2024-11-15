@@ -12,11 +12,12 @@ ca = [-148.61223, 60.38938]#lon,lat
 class ordered_list:#list but all items are ordered
     items = [];
     def add(self, v, low = 0,high = None, key = lambda a,i: a[i]):
-        if len(self.items) == 0:#check if empty
-            self.items.append(v)
         if high == None:#check for first recursion
             high = len(self.items)-1
-        if high >= low:#check if done searching
+        if len(self.items) == 0:#check if empty
+            self.items.append(v)
+        
+        elif high >= low:#check if done searching
             mid = (high + low) // 2
             if self.items[mid] == v:#check if found same value
                 self.items.insert(mid+1, v)
@@ -104,18 +105,14 @@ def comp(arr,a,b):#comparator or spot data structure
         nv = b.get('rx_lat')
     else:
         nv = b.get('tx_lat')
-    return ov > nv #return if old node is higher
+    return ov < nv #return if old node is higher
             
             
 def intersect_point(d):#find points of intersection
     a = sorted(d, key=first_node, reverse=True)#sorting by highest higher node
     o = ordered_list()
     for i in a:#
-        if len(o.items) == 0:
-            o.add(i, key = comp)
-        else:
-            for j in o.items:
-                o.add(i, key = comp)
+        o.add(i, key = comp)
     print(o.items)
 
     print(time.process_time())
