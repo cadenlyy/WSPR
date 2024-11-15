@@ -3,8 +3,8 @@ import query
 import datetime
 import math
 import csv
-import json
 import os
+import time
 
 
 def roundEvenDateTime(a): #YYYY-MM-DD HH:MM:SS
@@ -34,58 +34,29 @@ def print_csv(t, ts, te, MR, data, rx = None, tx = None):
     filename = t+rx+tx+'_'+ts.strftime("%Y-%m-%d_%H-%M-%S")+'_'+te.strftime("%Y-%m-%d_%H-%M-%S")+'_'+str(MR).split(':')[0]+'-'+str(MR).split(':')[1]+'-'+str(MR).split(':')[2]+'.csv'
     abs_file = os.path.join(base_dir, filename)
     with open(abs_file, 'w', newline='') as csvfile:
-        fieldnames = ['time', 'band', 'frequency', 'snr', 'drift', 'SS:freq', 'SS:snr', 'SS:drift', 'Numofspots']
+        fieldnames = list(data[0].keys())
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(data)
         
-def print_json(t, ts, te, MR, data, rx = None, tx = None):
-    if rx == None:
-        rx = ''
-    else:
-        rx = '_'+rx
-    if tx == None:
-        tx = ''
-    else:
-        tx = '_'+tx
-        
-    base_dir = "C:/Users/Lyiyang1/Desktop/wspr/data/json"
-    filename = t+rx+tx+'_'+ts.strftime("%Y-%m-%d_%H-%M-%S")+'_'+te.strftime("%Y-%m-%d_%H-%M-%S")+'_'+str(MR).split(':')[0]+'-'+str(MR).split(':')[1]+'-'+str(MR).split(':')[2]+'.txt'
-    abs_file = os.path.join(base_dir, filename)
-    with open(abs_file, 'w') as file: 
-        file.write(json.dumps(data))
 
-def read_json(t, ts, te, MR, rx = None, tx = None):
-    if rx == None:
-        rx = ''
-    else:
-        rx = '_'+rx
-    if tx == None:
-        tx = ''
-    else:
-        tx = '_'+tx
-    base_dir = "C:/Users/Lyiyang1/Desktop/wspr/data/json"
-    filename = t+rx+tx+'_'+ts.strftime("%Y-%m-%d_%H-%M-%S")+'_'+te.strftime("%Y-%m-%d_%H-%M-%S")+'_'+str(MR).split(':')[0]+'-'+str(MR).split(':')[1]+'-'+str(MR).split(':')[2]+'.txt'
-    abs_file = os.path.join(base_dir, filename)
-    print(abs_file)
-    with open(abs_file, 'r') as file: 
-        data = file.read()
-        return json.loads(data)
 
-def all_spots(MR,ts,te):
+
+
+def anomalies(f, MR, ts, te, rx = None, tx = None):
     #wspr query
     #colums, database, start dateTime, end dateTime, rx_sign = None, tx_sign = None limit = None
-    q = query.wsprlive_get("*", "rx", str(ts), str(te))
-    #q = [{'id': '8100420947', 'time': '2024-07-24 09:26:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 1, 'power': 23, 'snr': 1, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'id': '8100420947', 'time': '2024-07-24 09:26:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 2, 'power': 23, 'snr': -7, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'id': '8100420947', 'time': '2024-07-24 09:28:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 1000000000000000000000000, 'power': 23, 'snr': 3, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'id': '8100420947', 'time': '2024-07-24 09:30:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 4, 'power': 23, 'snr': -10, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1}]
-    
-    #print_json('all', ts, te, MR, q)
-    #q = read_json('all', ts, te, MR)
-    #print(q)
+    if f == 'r':
+        if rx == None and tx == None:
+            q = query.read_json('all', ts, te, MR)
+        else:
+            q = query.read_json('pair', ts, te, MR, rx, tx)
+    elif f == 't':
+        q = [{'id': '8100420947', 'time': '2024-07-24 09:26:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 1, 'power': 23, 'snr': 1, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'id': '8100420947', 'time': '2024-07-24 09:26:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 2, 'power': 23, 'snr': -7, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'id': '8100420947', 'time': '2024-07-24 09:28:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 1000000000000000000000000, 'power': 23, 'snr': 3, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'id': '8100420947', 'time': '2024-07-24 09:30:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 4, 'power': 23, 'snr': -10, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1}]
     
     print("wspr.rx query successful") #check if proccessing is slow
     
     #id, time, band, rx_sign, rx_lat, rx_lon, rx_loc, tx_sign, tx_lat, tx_lon, tx_loc, distance, azimuth, rx_azimuth, *frequency, power, *snr, *drift, version, code
-
     #adjList with weight
     transmitions = {} #dict mapping receiver to dict of transmitters with dictionary mapping time to 2 arrays, one of spot details, one for sum, mean and SD (i.e a{{{[[[]],[]}}})
     
@@ -181,7 +152,7 @@ def all_spots(MR,ts,te):
 
             
     #calculating standard score and detecting abnormallies
-    abnormallies = []
+    a = []
     ssT = 1
     for r in transmitions.items():
         for c in r[1].items():
@@ -193,17 +164,34 @@ def all_spots(MR,ts,te):
                                 transmitions.get(r[0]).get(c[0]).get(t[0]).get(i[0])[0][0][0] = ss(j[14],i[1][1][6],i[1][1][9])
                                 transmitions.get(r[0]).get(c[0]).get(t[0]).get(i[0])[0][0][1] = ss(j[16],i[1][1][7],i[1][1][10])
                                 transmitions.get(r[0]).get(c[0]).get(t[0]).get(i[0])[0][0][2] = ss(j[17],i[1][1][8],i[1][1][11])
-                                abnormallies.append([ss(j[14],i[1][1][6],i[1][1][9]),ss(j[16],i[1][1][7],i[1][1][10]),ss(j[17],i[1][1][8],i[1][1][11])]+j[3:])
+                                p = transmitions.get(r[0]).get(c[0]).get(t[0]).get(i[0])[0][0]
+                                a.append({'SS_freq': p[0], 'SS_snr': p[1], 'SS_drift': p[2], 'id': p[3], 'time': p[4], 'band': p[5], 'rx_sign': p[6], 'rx_lat': p[7], 'rx_lon': p[8], 'rx_loc': p[9], 'tx_sign': p[10], 'tx_lat': p[11], 'tx_lon': p[12], 'tx_loc': p[13], 'distance': p[14], 'azimuth': p[15], 'rx_azimuth': p[16], 'frequency': p[17], 'power': p[18], 'snr': p[19], 'drift': p[20], 'version': p[21], 'code': p[22]})
     
-    return abnormallies
+    print(a)
+    print(time.process_time())
+    
+    return a
 
-   
+if __name__ == "__main__":
+    s = datetime.datetime(2024,9,1,0,0,0) #Y,M,D,h,m,s
+    e = datetime.datetime(2024,9,1,0,0,1)
+    MR = datetime.timedelta(minutes = 2)
     
-def one_pair(MR,ts,te,rx,tx):
+    #pair_KL3RR_WF1A_2024-09-01_00-00-00_2024-09-03_23-59-59_3-00-00
+    one_pair('t', MR, s, e, 'KL3RR', 'VE7AHT')    
+    
+    #one_pair(MR, datetime.datetime(2024,7,24,9,26,0), datetime.datetime(2024,7,24,9,30,0), 'KJ6MKI', 'W6LPM')
+    #all_spots(MR, s, e)
+
+
+''' 
+def one_pair(f,MR,ts,te,rx,tx):
     #wspr query
     #colums, database, start dateTime, end dateTime, rx_sign = None, tx_sign = None limit = None
-    q = query.wsprlive_get("*", "rx", str(ts), str(te), rx, tx)
-    #q = [{'id': '8100420947', 'time': '2024-07-24 09:26:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 1, 'power': 23, 'snr': 1, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'id': '8100420947', 'time': '2024-07-24 09:26:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 2, 'power': 23, 'snr': -7, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'id': '8100420947', 'time': '2024-07-24 09:28:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 1000000000000000000000000, 'power': 23, 'snr': 3, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'id': '8100420947', 'time': '2024-07-24 09:30:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 4, 'power': 23, 'snr': -10, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1}]
+    if f == 'r':
+        q = query.read_json('pair', ts, te, MR, rx, tx)
+    elif f =='t':
+        q = [{'id': '8100420947', 'time': '2024-07-24 09:26:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 1, 'power': 23, 'snr': 1, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'id': '8100420947', 'time': '2024-07-24 09:26:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 2, 'power': 23, 'snr': -7, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'id': '8100420947', 'time': '2024-07-24 09:28:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 1000000000000000000000000, 'power': 23, 'snr': 3, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'id': '8100420947', 'time': '2024-07-24 09:30:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 4, 'power': 23, 'snr': -10, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1}]
     print("wspr.rx query successful") #check if proccessing is slow
     
     #id, time, band, rx_sign, rx_lat, rx_lon, rx_loc, tx_sign, tx_lat, tx_lon, tx_loc, distance, azimuth, rx_azimuth, *frequency, power, *snr, *drift, version, code
@@ -318,23 +306,13 @@ def one_pair(MR,ts,te,rx,tx):
             print(i)
     
     print_csv('pair',ts,te,MR, data,rx,tx)
+    print(data)
     
+    print(time.process_time())
     
     
     #print (transmitions)       
-
-if __name__ == "__main__":
-    s = datetime.datetime(2024,9,1,0,0,0) #Y,M,D,h,m,s
-    e = datetime.datetime(2024,9,1,10,0,0)
-    MR = datetime.timedelta(minutes = 180)
-    
-    #pair_KL3RR_WF1A_2024-09-01_00-00-00_2024-09-03_23-59-59_3-00-00
-    #one_pair(MR, s, e, 'KL3RR', 'VE7AHT')    
-    
-    #one_pair(MR, datetime.datetime(2024,7,24,9,26,0), datetime.datetime(2024,7,24,9,30,0), 'KJ6MKI', 'W6LPM')
-    all_spots(MR, s, e)
-
-                    
+'''
 
             
                     

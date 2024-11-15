@@ -1,59 +1,31 @@
-import numpy as np
-import math
+class ordered_list:
+    items = [];
+    def add(self, v, low = 0,high = None, key = lambda a,i: a[i]):
+        if high == None:
+            high = len(self.items)-1
+        if len(self.items) == 0:
+            self.items.append(v)
+        elif high >= low:
+            mid = (high + low) // 2
+            if self.items[mid] == v:
+                self.items.insert(mid+1, v)
+            elif key(self.items,mid,v):
+                self.add(v, low, mid - 1, key)
+            else:
+                self.add(v, mid + 1, high, key)
+        else:
+            self.items.insert(low, v)
+            
+            
+ol = ordered_list()
 
-# Define points in great circle 1
-p1_lat1 = 32.498520
-p1_long1 = -106.816846
-p1_lat2 = 38.199999
-p1_long2 = -102.371389
+d = [{'lat': 1},{'lat': 2},{'lat': -1},{'lat': 4}]
 
-# Define points in great circle 2
-p2_lat1 = 34.086771
-p2_long1 = -107.313379
-p2_lat2 = 34.910553
-p2_long2 = -98.711786
 
-# Convert points in great circle 1, degrees to radians
-p1_lat1_rad = ((math.pi * p1_lat1) / 180.0)
-p1_long1_rad = ((math.pi * p1_long1) / 180.0)
-p1_lat2_rad = ((math.pi * p1_lat2) / 180.0)
-p1_long2_rad = ((math.pi * p1_long2) / 180.0)
+def comp(arr,a,b):
+    return arr[a].get('lat') < b.get('lat')
 
-# Convert points in great circle 2, degrees to radians
-p2_lat1_rad = ((math.pi * p2_lat1) / 180.0)
-p2_long1_rad = ((math.pi * p2_long1) / 180.0)
-p2_lat2_rad = ((math.pi * p2_lat2) / 180.0)
-p2_long2_rad = ((math.pi * p2_long2) / 180.0)
-
-# Put in polar coordinates
-x1 = math.cos(p1_lat1_rad) * math.cos(p1_long1_rad)
-y1 = math.cos(p1_lat1_rad) * math.sin(p1_long1_rad)
-z1 = math.sin(p1_lat1_rad)
-x2 = math.cos(p1_lat2_rad) * math.cos(p1_long2_rad)
-y2 = math.cos(p1_lat2_rad) * math.sin(p1_long2_rad)
-z2 = math.sin(p1_lat2_rad)
-cx1 = math.cos(p2_lat1_rad) * math.cos(p2_long1_rad)
-cy1 = math.cos(p2_lat1_rad) * math.sin(p2_long1_rad)
-cz1 = math.sin(p2_lat1_rad)
-cx2 = math.cos(p2_lat2_rad) * math.cos(p2_long2_rad)
-cy2 = math.cos(p2_lat2_rad) * math.sin(p2_long2_rad)
-cz2 = math.sin(p2_lat2_rad)
-
-# Get normal to planes containing great circles
-# np.cross product of vector to each point from the origin
-N1 = np.cross([x1, y1, z1], [x2, y2, z2])
-N2 = np.cross([cx1, cy1, cz1], [cx2, cy2, cz2])
-
-# Find line of intersection between two planes
-L = np.cross(N1, N2)
-
-# Find two intersection points
-X1 = L / np.sqrt(L[0]**2 + L[1]**2 + L[2]**2)
-X2 = -X1
-i_lat1 = math.asin(X1[2]) * 180./np.pi
-i_long1 = math.atan2(X1[1], X1[0]) * 180./np.pi
-i_lat2 = math.asin(X2[2]) * 180./np.pi
-i_long2 = math.atan2(X2[1], X2[0]) * 180./np.pi
-
-# Print results
-print (i_lat1, i_long1, i_lat2, i_long2)
+for i in d:
+    ol.add(i, key = comp)
+    
+print(ol.items)

@@ -2,6 +2,7 @@ import process
 import datetime
 import math
 import numpy as np
+import time
 
 crx = [-149.958, 61.146] #lon, lat
 ctx = [-155.04, 19.4792]
@@ -68,12 +69,70 @@ def intersect_greatcircle(A, B, C, D):#lat,lon
         print (i_lat1, i_long1)
     else:
         print(i_lat2, i_long2)
+        
+    print(time.process_time())
+        
+def first_node(a):
+    if a.get('rx_lat') > a.get('tx_lat'):
+        print(time.process_time())
+        return a.get('rx_lat')
+    print(time.process_time())
+    return a.get('tx_lat')
 
+class ordered_list:
+    items = [];
+    def add(self, v, low = 0,high = None, key = lambda a,i: a[i]):
+        if len(self.items) == 0:
+            self.items.append(v)
+        if high == None:
+            high = len(self.items)-1
+        if len(self.items) == 0:
+            self.items.append(v)
+        elif high >= low:
+            mid = (high + low) // 2
+            if self.items[mid] == v:
+                self.items.insert(mid+1, v)
+            elif key(self.items,mid,v):
+                self.add(v, low, mid - 1, key)
+            else:
+                self.add(v, mid + 1, high, key)
+        else:
+            self.items.insert(low, v)
+            
+def comp(arr,a,b):
+    if arr[a].get('rx_lat') < arr[a].get('tx_lat'):
+        ov = arr[a].get('rx_lat')
+    else:
+        ov = arr[a].get('tx_lat')
+    if b.get('rx_lat') < b.get('tx_lat'):
+        nv = b.get('rx_lat')
+    else:
+        nv = b.get('tx_lat')
+    return ov < nv
+            
+            
+def intersect_point(d):
+    a = sorted(d, key=first_node, reverse=True)
+    print(a)
+    o = ordered_list()
+    for i in a:
+        if len(o.items) == 0:
+            o.add(i, key = comp)
+        else:
+            for j in o.items:
+                o.add(i, key = comp)
+    print(o.items)
 
+    print(time.process_time())
     
-s = datetime.datetime(2024,9,1,0,0,0) #Y,M,D,h,m,s
-e = datetime.datetime(2024,9,1,10,0,0)
-MR = datetime.timedelta(minutes = 180)
-
-A = process.all_spots(MR, s, e)
+if __name__ == "__main__":  
+    d = [{'rx_lat': 1, 'tx_lat': 9},{'rx_lat': -7, 'tx_lat': 3},{'rx_lat': 3, 'tx_lat': 0}]
+    
+    s = datetime.datetime(2024,9,1,0,0,0) #Y,M,D,h,m,s
+    e = datetime.datetime(2024,9,1,0,0,0)
+    MR = datetime.timedelta(minutes = 180)
+    
+    #A = process.anomalies('r', MR, ts, te)
+    
+    intersect_point(d)
     
