@@ -64,6 +64,7 @@ def print_json(t, ts, te, MR, data, rx = None, tx = None):#type, ts, te, MR, dat
     #writing to json
     with open(abs_file, 'w') as file: 
         file.write(json.dumps(data))
+    print(time.process_time())
 
 #reading data from json to accomodate large amt of data
 def read_json(t, ts, te, MR, rx = None, tx = None):
@@ -83,12 +84,14 @@ def read_json(t, ts, te, MR, rx = None, tx = None):
     #reading from json
     with open(abs_file, 'r') as file: 
         data = file.read()
+        print(time.process_time())
         return json.loads(data)
 
 #putting data queried from WSPR into json file
 def wspr_to_json(t, ts, te, MR, rx = None, tx = None):
     q = wsprlive_get("*", "rx", str(ts), str(te))
-    print('wspr.rx query successful') #incase wspr dies
+    print('wspr.rx query successful')
+    print(time.process_time())#incase wspr dies
     print_json(t, ts, te, MR, q, rx, tx)
 
 if __name__ == "__main__":
