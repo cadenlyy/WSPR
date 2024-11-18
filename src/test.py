@@ -1,31 +1,11 @@
-class ordered_list:
-    items = [];
-    def add(self, v, low = 0,high = None, key = lambda a,i: a[i]):
-        if high == None:
-            high = len(self.items)-1
-        if len(self.items) == 0:
-            self.items.append(v)
-        elif high >= low:
-            mid = (high + low) // 2
-            if self.items[mid] == v:
-                self.items.insert(mid+1, v)
-            elif key(self.items,mid,v):
-                self.add(v, low, mid - 1, key)
-            else:
-                self.add(v, mid + 1, high, key)
-        else:
-            self.items.insert(low, v)
-            
-            
-ol = ordered_list()
+a1 = -80
+a2 = -80
+a3 = 80
+a4 = 80
+b1 = -80
+b2 = -85
+b3 = 85
+b4 = 80
 
-d = [{'lat': 1},{'lat': 2},{'lat': -1},{'lat': 4}]
-
-
-def comp(arr,a,b):
-    return arr[a].get('lat') < b.get('lat')
-
-for i in d:
-    ol.add(i, key = comp)
-    
-print(ol.items)
+if (a1 != b1 or a2 != b2) and (a3 != b3 or a4 != b4):
+    print('a')

@@ -7,8 +7,8 @@ import datetime
 import time
 import process
 
-map = Basemap(projection='cyl',llcrnrlat=45,urcrnrlat=60,
-            llcrnrlon=-10,urcrnrlon=10,resolution='c')
+map = Basemap(projection='cyl',llcrnrlat=-90,urcrnrlat=90,
+            llcrnrlon=-180,urcrnrlon=180,resolution='c')
 
 class plane: #maintain the necessary details for each plane
     lat = 0
@@ -24,7 +24,7 @@ class plane: #maintain the necessary details for each plane
         plt.annotate('', xy=(map(self.ac[0],self.ac[1])), xytext=(map(self.ac[2],self.ac[3])),arrowprops=dict(arrowstyle="->"))
 
 #"fixing" bug in drawgreatcircle
-def fdrawgreatcircle(maplength,p1_lon, p1_lat,p2_lon,p2_lat, linewidth = 1, c = 'red'):
+def fdrawgreatcircle(maplength,p1_lon, p1_lat,p2_lon,p2_lat, linewidth = 1, c = 'red', zorder = 1):
     
     #checking for left most node
     if p1_lon > p2_lon:
@@ -42,15 +42,15 @@ def fdrawgreatcircle(maplength,p1_lon, p1_lat,p2_lon,p2_lat, linewidth = 1, c = 
         lmp = check.intersect_greatcircle([lat1, lon1], [lat2,lon2], [-90, maplength[0]], [90, maplength[0]])
         rmp = check.intersect_greatcircle([lat1, lon1], [lat2,lon2], [-90, maplength[1]], [90, maplength[1]])
         if lmp[1] == maplength[0]:
-            map.drawgreatcircle(lon1, lat1, lmp[1], lmp[0], linewidth = linewidth, c = c)
+            map.drawgreatcircle(lon1, lat1, lmp[1], lmp[0], linewidth = linewidth, c = c, zorder = zorder)
         else:
-            map.drawgreatcircle(lon1, lat1, lmp[3], lmp[2], linewidth = linewidth, c = c)
+            map.drawgreatcircle(lon1, lat1, lmp[3], lmp[2], linewidth = linewidth, c = c, zorder = zorder)
         if lmp[1] == maplength[0]:
-            map.drawgreatcircle(lon2, lat2, rmp[1], rmp[0], linewidth = linewidth, c = c)
+            map.drawgreatcircle(lon2, lat2, rmp[1], rmp[0], linewidth = linewidth, c = c, zorder = zorder)
         else:
-            map.drawgreatcircle(lon2, lat2, rmp[3], rmp[2], linewidth = linewidth, c = c)
+            map.drawgreatcircle(lon2, lat2, rmp[3], rmp[2], linewidth = linewidth, c = c, zorder = zorder)
     else:
-        map.drawgreatcircle(lon1, lat1, lon2, lat2, linewidth = linewidth, c = c)
+        map.drawgreatcircle(lon1, lat1, lon2, lat2, linewidth = linewidth, c = c, zorder = zorder)
             
 #plot greatcircle for all data points
 def plotgreatcircle_abnomaly(t):
@@ -83,29 +83,34 @@ def p():#draw map and all plots
     
     #plotgreatcircle_abnomal(t)
 
-    for j in range (10):
-        i = t[j]
-        p1_lat1 = i[2].get('rx_lat')
-        p1_long1 = i[2].get('rx_lon')
-        p1_lat2 = i[2].get('tx_lat')
-        p1_long2 = i[2].get('tx_lon')
-        if int(p1_lat1) == int(p1_lat2):
-            p1_lat1+=1
-        if int(p1_long1) == int(p1_long2):
-            p1_long1+=1
-        fdrawgreatcircle([-180, 180], p1_long1, p1_lat1, p1_long2, p1_lat2)
+    c = None
+    for i in t:
+        if c == None:
+            c = i[2].get('time')
+        elif c == i[2].get('time'):
+            p1_lat1 = i[2].get('rx_lat')
+            p1_long1 = i[2].get('rx_lon')
+            p1_lat2 = i[2].get('tx_lat')
+            p1_long2 = i[2].get('tx_lon')
+            if int(p1_lat1) == int(p1_lat2):
+                p1_lat1+=1
+            if int(p1_long1) == int(p1_long2):
+                p1_long1+=1
+            fdrawgreatcircle([-180, 180], p1_long1, p1_lat1, p1_long2, p1_lat2, linewidth= 0.5, c='blue',zorder=1)
+            
+            p2_lat1 = i[3].get('rx_lat')
+            p2_long1 = i[3].get('rx_lon')
+            p2_lat2 = i[3].get('tx_lat')
+            p2_long2 = i[3].get('tx_lon')
+            if int(p2_lat1) == int(p2_lat2):
+                p2_lat1+=1
+            if int(p2_long1) == int(p2_long2):
+                p2_long1+=1
+            fdrawgreatcircle([-180, 180], p2_long1, p2_lat1, p2_long2, p2_lat2, linewidth= 0.5, c='blue',zorder=1)
         
-        p2_lat1 = i[3].get('rx_lat')
-        p2_long1 = i[3].get('rx_lon')
-        p2_lat2 = i[3].get('tx_lat')
-        p2_long2 = i[3].get('tx_lon')
-        if int(p2_lat1) == int(p2_lat2):
-            p2_lat1+=1
-        if int(p2_long1) == int(p2_long2):
-            p2_long1+=1
-        fdrawgreatcircle([-180, 180], p2_long1, p2_lat1, p2_long2, p2_lat2)
-    
-        plt.scatter([i[1]], [i[0]])
+            plt.scatter([i[1]], [i[0]], s = 1, c = 'red',zorder=2)
+        else:
+            break
 
     #plt.title("2024-09-03 05:46:00")
     plt.show()
