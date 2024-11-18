@@ -7,7 +7,7 @@ import datetime
 import time
 import process
 import query
-
+plt.figure(figsize=(100,60))
 map = Basemap(projection='cyl',llcrnrlat=-90,urcrnrlat=90,
             llcrnrlon=-180,urcrnrlon=180,resolution='c')
 
@@ -61,7 +61,7 @@ def plotgreatcircle_abnomaly(t):
 
 def p():#draw map and all plots
     st = time.process_time()
-    map.drawcoastlines(linewidth=0.25)
+    map.drawcoastlines(linewidth=5)
    # map.drawmapboundary()
     
     map.drawmeridians(np.arange(0,360,30))
@@ -87,7 +87,7 @@ def p():#draw map and all plots
 
     c = None
     for i in t:
-        if c != '2024-09-01 03:12:00':
+        if c != '2024-09-01 03:02:00':
             c = i[2].get('time')
             
         elif c == i[2].get('time'):
@@ -99,7 +99,7 @@ def p():#draw map and all plots
                 p1_lat1+=1
             if int(p1_long1) == int(p1_long2):
                 p1_long1+=1
-            fdrawgreatcircle([-180, 180], p1_long1, p1_lat1, p1_long2, p1_lat2, linewidth= 0.5, c='blue',zorder=1)
+            fdrawgreatcircle([-180, 180], p1_long1, p1_lat1, p1_long2, p1_lat2, linewidth= 10, c='blue',zorder=1)
             
             p2_lat1 = i[3].get('rx_lat')
             p2_long1 = i[3].get('rx_lon')
@@ -109,16 +109,17 @@ def p():#draw map and all plots
                 p2_lat1+=1
             if int(p2_long1) == int(p2_long2):
                 p2_long1+=1
-            fdrawgreatcircle([-180, 180], p2_long1, p2_lat1, p2_long2, p2_lat2, linewidth= 0.5, c='blue',zorder=1)
+            fdrawgreatcircle([-180, 180], p2_long1, p2_lat1, p2_long2, p2_lat2, linewidth= 10, c='blue',zorder=1)
         
-            plt.scatter([i[1]], [i[0]], s = 1, c = 'red',zorder=2)
+            plt.plot([i[1]], [i[0]], marker=".", markersize=50, c = 'red',zorder=2)
             if i[0] == -15.728999999999997:
                 print(i)
             
         else:
             break
 
-    plt.title(c)
+    plt.title(c, fontsize = 100)
+    plt.savefig("C:/Users/Lyiyang1/Desktop/wspr/data/plot/"+c[0:10]+'_'+c[11:13]+'-'+c[14:16]+'-'+c[17:19]+".png", format="png", dpi=100)
     plt.show()
     
     print("plot,",time.process_time()-st)
