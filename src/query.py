@@ -28,6 +28,7 @@ import datetime
 
 #query data from wspr.net
 def wsprlive_get(col, database, ts, te, rx = None, tx = None, l=None): #colums, database, start dateTime, end dateTime, rx_sign = None, tx_sign = None limit = None
+    st = time.process_time()    
     # put together the request url
     q = "SELECT " + col + " FROM " + database + " WHERE time >= '" + ts + "' AND time < '" + te + "'"
     
@@ -43,7 +44,7 @@ def wsprlive_get(col, database, ts, te, rx = None, tx = None, l=None): #colums, 
     # download contents from wspr.live
     contents = urllib.request.urlopen(url).read()
     
-    print("wsprlive_get,",time.process_time())
+    print("wsprlive_get,",time.process_time()-st)
     # return the json decoded data
     return json.loads(contents.decode("UTF-8"))["data"]
 
@@ -68,6 +69,7 @@ def print_json(t, ts, te, MR, data, rx = None, tx = None):#type, ts, te, MR, dat
 
 #reading data from json to accomodate large amt of data
 def read_json(t, ts, te, MR, rx = None, tx = None):
+    st = time.process_time()
     #checking if one_pair or all_pairs
     if rx == None:
         rx = ''
@@ -84,14 +86,15 @@ def read_json(t, ts, te, MR, rx = None, tx = None):
     #reading from json
     with open(abs_file, 'r') as file: 
         data = file.read()
-        print("read_json,",time.process_time())
+        print("read_json,",time.process_time()-st)
         return json.loads(data)
 
 #putting data queried from WSPR into json file
 def wspr_to_json(t, ts, te, MR, rx = None, tx = None):
+    st = time.process_time()
     q = wsprlive_get("*", "rx", str(ts), str(te))
     print('wspr.rx query successful')
-    print("Wspr_to_json,",time.process_time())#incase wspr dies
+    print("Wspr_to_json,",time.process_time()-st)#incase wspr dies
     print_json(t, ts, te, MR, q, rx, tx)
 
 if __name__ == "__main__":

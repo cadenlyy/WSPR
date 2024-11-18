@@ -6,6 +6,7 @@ import check
 import datetime
 import time
 import process
+import query
 
 map = Basemap(projection='cyl',llcrnrlat=-90,urcrnrlat=90,
             llcrnrlon=-180,urcrnrlon=180,resolution='c')
@@ -59,7 +60,7 @@ def plotgreatcircle_abnomaly(t):
             map.drawgreatcircle(i[8], i[7], i[12], i[11],  linewidth = 0.01, c = "red")
 
 def p():#draw map and all plots
-    
+    st = time.process_time()
     map.drawcoastlines(linewidth=0.25)
    # map.drawmapboundary()
     
@@ -76,17 +77,19 @@ def p():#draw map and all plots
     
     #spots
     s = datetime.datetime(2024,9,1,0,0,0) #Y,M,D,h,m,s
-    e = datetime.datetime(2024,9,1,10,0,0)
+    e = datetime.datetime(2024,9,1,7,0,0)
     MR = datetime.timedelta(minutes = 180)
     
-    t = check.intersect_point(process.anomalies('r', MR, s, e))
+    t = query.read_json('all_points', s, e, MR)
+    #t = check.intersect_point(process.anomalies('r', MR, s, e))
     
     #plotgreatcircle_abnomal(t)
 
     c = None
     for i in t:
-        if c == None:
+        if c != '2024-09-01 03:12:00':
             c = i[2].get('time')
+            
         elif c == i[2].get('time'):
             p1_lat1 = i[2].get('rx_lat')
             p1_long1 = i[2].get('rx_lon')
@@ -109,13 +112,16 @@ def p():#draw map and all plots
             fdrawgreatcircle([-180, 180], p2_long1, p2_lat1, p2_long2, p2_lat2, linewidth= 0.5, c='blue',zorder=1)
         
             plt.scatter([i[1]], [i[0]], s = 1, c = 'red',zorder=2)
+            if i[0] == -15.728999999999997:
+                print(i)
+            
         else:
             break
 
-    #plt.title("2024-09-03 05:46:00")
+    plt.title(c)
     plt.show()
     
-    print("plot,",time.process_time())
+    print("plot,",time.process_time()-st)
     
 if __name__ == "__main__":  
     p()

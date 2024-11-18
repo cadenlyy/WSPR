@@ -46,6 +46,7 @@ def print_csv(t, ts, te, MR, data, rx = None, tx = None):#output to csv file
         
 #main processing and calculation of anomalous data
 def anomalies(f, MR, ts, te, rx = None, tx = None):
+    st = time.process_time()
     #wspr query
     #id, time, band, rx_sign, rx_lat, rx_lon, rx_loc, tx_sign, tx_lat, tx_lon, tx_loc, distance, azimuth, rx_azimuth, *frequency, power, *snr, *drift, version, code
     if f == 'r':#read from json
@@ -174,20 +175,22 @@ def anomalies(f, MR, ts, te, rx = None, tx = None):
                                 #copying anomalies
                                 p = transmitions.get(r[0]).get(c[0]).get(t[0]).get(i[0])[0][0]
                                 a.append({'SS_freq': p[0], 'SS_snr': p[1], 'SS_drift': p[2], 'id': p[3], 'time': p[4], 'band': p[5], 'rx_sign': p[6], 'rx_lat': p[7], 'rx_lon': p[8], 'rx_loc': p[9], 'tx_sign': p[10], 'tx_lat': p[11], 'tx_lon': p[12], 'tx_loc': p[13], 'distance': p[14], 'azimuth': p[15], 'rx_azimuth': p[16], 'frequency': p[17], 'power': p[18], 'snr': p[19], 'drift': p[20], 'version': p[21], 'code': p[22]})
+                                
+    #print_csv('all',ts,te,MR,a)
     
-    #print(a)#
-    print("anomalies,",time.process_time())#checking code speed
+    #print(a)
+    print("anomalies,",time.process_time()-st)#checking code speed
     
     return a
 
 if __name__ == "__main__":
     #process details
     s = datetime.datetime(2024,9,1,0,0,0) #Y,M,D,h,m,s
-    e = datetime.datetime(2024,9,1,0,0,1)
-    MR = datetime.timedelta(minutes = 2)
+    e = datetime.datetime(2024,9,1,7,0,0)
+    MR = datetime.timedelta(minutes = 180)
     
     #pair_KL3RR_WF1A_2024-09-01_00-00-00_2024-09-03_23-59-59_3-00-00
-    anomalies('t', MR, s, e, 'KL3RR', 'VE7AHT')    
+    anomalies('r', MR, s, e)    
     
     #one_pair(MR, datetime.datetime(2024,7,24,9,26,0), datetime.datetime(2024,7,24,9,30,0), 'KJ6MKI', 'W6LPM')
     #all_spots(MR, s, e)
