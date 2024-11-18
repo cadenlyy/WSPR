@@ -2,6 +2,7 @@ import urllib.request
 import json
 import time
 import os
+import datetime
 
 #   name             type
 #|id        |UInt64                |
@@ -42,7 +43,7 @@ def wsprlive_get(col, database, ts, te, rx = None, tx = None, l=None): #colums, 
     # download contents from wspr.live
     contents = urllib.request.urlopen(url).read()
     
-    print(time.process_time())
+    print("wsprlive_get,",time.process_time())
     # return the json decoded data
     return json.loads(contents.decode("UTF-8"))["data"]
 
@@ -64,7 +65,6 @@ def print_json(t, ts, te, MR, data, rx = None, tx = None):#type, ts, te, MR, dat
     #writing to json
     with open(abs_file, 'w') as file: 
         file.write(json.dumps(data))
-    print(time.process_time())
 
 #reading data from json to accomodate large amt of data
 def read_json(t, ts, te, MR, rx = None, tx = None):
@@ -84,15 +84,20 @@ def read_json(t, ts, te, MR, rx = None, tx = None):
     #reading from json
     with open(abs_file, 'r') as file: 
         data = file.read()
-        print(time.process_time())
+        print("read_json,",time.process_time())
         return json.loads(data)
 
 #putting data queried from WSPR into json file
 def wspr_to_json(t, ts, te, MR, rx = None, tx = None):
     q = wsprlive_get("*", "rx", str(ts), str(te))
     print('wspr.rx query successful')
-    print(time.process_time())#incase wspr dies
+    print("Wspr_to_json,",time.process_time())#incase wspr dies
     print_json(t, ts, te, MR, q, rx, tx)
 
 if __name__ == "__main__":
-    print(wsprlive_get("*", "rx", '2024-09-01 00:00:00', '2024-09-01 07:00:00'))
+    #print(wsprlive_get("*", "rx", '2024-09-01 00:00:00', '2024-09-01 07:00:00'))
+    s = datetime.datetime(2024,9,1,0,0,0) #Y,M,D,h,m,s
+    e = datetime.datetime(2024,9,1,7,0,0)
+    MR = datetime.timedelta(minutes = 180)
+    
+    wspr_to_json('all', s, e, MR)

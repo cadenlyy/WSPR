@@ -176,7 +176,7 @@ def anomalies(f, MR, ts, te, rx = None, tx = None):
                                 a.append({'SS_freq': p[0], 'SS_snr': p[1], 'SS_drift': p[2], 'id': p[3], 'time': p[4], 'band': p[5], 'rx_sign': p[6], 'rx_lat': p[7], 'rx_lon': p[8], 'rx_loc': p[9], 'tx_sign': p[10], 'tx_lat': p[11], 'tx_lon': p[12], 'tx_loc': p[13], 'distance': p[14], 'azimuth': p[15], 'rx_azimuth': p[16], 'frequency': p[17], 'power': p[18], 'snr': p[19], 'drift': p[20], 'version': p[21], 'code': p[22]})
     
     #print(a)#
-    print(time.process_time())#checking code speed
+    print("anomalies,",time.process_time())#checking code speed
     
     return a
 

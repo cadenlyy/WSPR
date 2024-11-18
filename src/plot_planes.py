@@ -2,9 +2,13 @@ from mpl_toolkits.basemap import Basemap
 import matplotlib.pyplot as plt
 import numpy as np
 import math
-import process
+import check
 import datetime
 import time
+import process
+
+map = Basemap(projection='cyl',llcrnrlat=45,urcrnrlat=60,
+            llcrnrlon=-10,urcrnrlon=10,resolution='c')
 
 class plane: #maintain the necessary details for each plane
     lat = 0
@@ -19,69 +23,95 @@ class plane: #maintain the necessary details for each plane
     def plot(self):#plot arrow on map
         plt.annotate('', xy=(map(self.ac[0],self.ac[1])), xytext=(map(self.ac[2],self.ac[3])),arrowprops=dict(arrowstyle="->"))
 
+#"fixing" bug in drawgreatcircle
+def fdrawgreatcircle(maplength,p1_lon, p1_lat,p2_lon,p2_lat, linewidth = 1, c = 'red'):
+    
+    #checking for left most node
+    if p1_lon > p2_lon:
+        lat1 = p2_lat
+        lon1 = p2_lon
+        lat2 = p1_lat
+        lon2 = p1_lon
+    else:
+        lat1 = p1_lat
+        lon1 = p1_lon
+        lat2 = p2_lat
+        lon2 = p2_lon
+    #check if it crosses boarder of map
+    if lon1-maplength[0]+maplength[1]-lon2 <= lon2-lon1:
+        lmp = check.intersect_greatcircle([lat1, lon1], [lat2,lon2], [-90, maplength[0]], [90, maplength[0]])
+        rmp = check.intersect_greatcircle([lat1, lon1], [lat2,lon2], [-90, maplength[1]], [90, maplength[1]])
+        if lmp[1] == maplength[0]:
+            map.drawgreatcircle(lon1, lat1, lmp[1], lmp[0], linewidth = linewidth, c = c)
+        else:
+            map.drawgreatcircle(lon1, lat1, lmp[3], lmp[2], linewidth = linewidth, c = c)
+        if lmp[1] == maplength[0]:
+            map.drawgreatcircle(lon2, lat2, rmp[1], rmp[0], linewidth = linewidth, c = c)
+        else:
+            map.drawgreatcircle(lon2, lat2, rmp[3], rmp[2], linewidth = linewidth, c = c)
+    else:
+        map.drawgreatcircle(lon1, lat1, lon2, lat2, linewidth = linewidth, c = c)
+            
 #plot greatcircle for all data points
 def plotgreatcircle_abnomaly(t):
     for i in t:
         if(int(i[8]) != int(i[12])+1 and int(i[8]) != int(i[12])-1 and int(i[8]) != int(i[12])):
             map.drawgreatcircle(i[8], i[7], i[12], i[11],  linewidth = 0.01, c = "red")
-    print(time.process_time())
 
-def plot():#draw map and all plots
-    #drawing map
-    map = Basemap(projection='cyl',llcrnrlat=-90,urcrnrlat=90,
-                llcrnrlon=-180,urcrnrlon=180,resolution='c')
+def p():#draw map and all plots
     
     map.drawcoastlines(linewidth=0.25)
-    map.drawmapboundary()
+   # map.drawmapboundary()
     
     map.drawmeridians(np.arange(0,360,30))
     map.drawparallels(np.arange(-90,90,30))
     
     #aircraft
-    one = plane(48.84321,-148.64913,129)
-    lon = [-148.64913,-150.25799,-148.61223]
-    lat = [48.84321,51.01763,60.38938]
+    #one = plane(48.84321,-148.64913,129)
+    
+    #x, y = map(one.ac[0],one.ac[1])
+    #x2, y2 = map(one.ac[2],one.ac[3])
+    
+    #one.plot()
     
     #spots
     s = datetime.datetime(2024,9,1,0,0,0) #Y,M,D,h,m,s
     e = datetime.datetime(2024,9,1,10,0,0)
     MR = datetime.timedelta(minutes = 180)
     
-    #t = process.all_spots(MR,s,e)
-    #print(t)
+    t = check.intersect_point(process.anomalies('r', MR, s, e))
     
-    #for i in points:
-    #    if i.get('lat') != None:
-    #        a = i.get('lon')
-    #        b = i.get('lat')
-    #    if (abs(a-crx[0]) < abs(crx[0]-ctx[0]) or abs(a-ctx[0]) < abs(crx[0]-ctx[0])) and (abs(b-crx[1]) < abs(crx[1]-ctx[1]) or abs(b-ctx[1]) < abs(crx[1]-ctx[1])): 
-    #        lon.append(a)
-    #        lat.append(b)
-    
-    x, y = map(one.ac[0],one.ac[1])
-    x2, y2 = map(one.ac[2],one.ac[3])
-    
-    one.plot()
-    
-    #plot abnormallies
     #plotgreatcircle_abnomal(t)
+
+    for j in range (10):
+        i = t[j]
+        p1_lat1 = i[2].get('rx_lat')
+        p1_long1 = i[2].get('rx_lon')
+        p1_lat2 = i[2].get('tx_lat')
+        p1_long2 = i[2].get('tx_lon')
+        if int(p1_lat1) == int(p1_lat2):
+            p1_lat1+=1
+        if int(p1_long1) == int(p1_long2):
+            p1_long1+=1
+        fdrawgreatcircle([-180, 180], p1_long1, p1_lat1, p1_long2, p1_lat2)
+        
+        p2_lat1 = i[3].get('rx_lat')
+        p2_long1 = i[3].get('rx_lon')
+        p2_lat2 = i[3].get('tx_lat')
+        p2_long2 = i[3].get('tx_lon')
+        if int(p2_lat1) == int(p2_lat2):
+            p2_lat1+=1
+        if int(p2_long1) == int(p2_long2):
+            p2_long1+=1
+        fdrawgreatcircle([-180, 180], p2_long1, p2_lat1, p2_long2, p2_lat2)
     
-    p1_lat1 = 32.498520
-    p1_long1 = -106.816846
-    p1_lat2 = 38.199999
-    p1_long2 = -102.371389
-    map.drawgreatcircle(p1_long1, p1_lat1, p1_long2, p1_lat2)
+        plt.scatter([i[1]], [i[0]])
+
+    #plt.title("2024-09-03 05:46:00")
+    plt.show()
     
-    # Define points in great circle 2
-    p2_lat1 = 34.086771
-    p2_long1 = -107.313379
-    p2_lat2 = 34.910553
-    p2_long2 = -98.711786
-    map.drawgreatcircle(p2_long1, p2_lat1, p2_long2, p2_lat2)
+    print("plot,",time.process_time())
     
-    plt.scatter([ 74.51906362183225,  -105.48093637816775], [-34.314378256910636, 34.314378256910636])
-            
-    plt.title("2024-09-03 05:46:00")
-    
-    print(time.process_time())
+if __name__ == "__main__":  
+    p()
 
