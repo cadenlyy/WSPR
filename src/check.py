@@ -110,6 +110,11 @@ def comp(arr,a,b):#comparator or spot data structure
     else:
         nv = b.get('tx_lat')
     return ov < nv #return if old node is higher
+
+def shortest_hdist(lon1,lon2,maplength):
+    l = min(lon1,lon2)
+    r = max(lon1,lon2)
+    return min(r-l,l-maplength[0]+maplength[1]-r)
             
 #find points of intersection
 def intersect_point(d):#list of dict with SS_freq, SS_snr,SS_drift,id, time, band, rx_sign, rx_lat, rx_lon, rx_loc, tx_sign, tx_lat, tx_lon, tx_loc, distance, azimuth, rx_azimuth, *frequency, power, *snr, *drift, version, code
@@ -138,14 +143,14 @@ def intersect_point(d):#list of dict with SS_freq, SS_snr,SS_drift,id, time, ban
                         #check for intersections
                         point = intersect_greatcircle([j.get('rx_lat'),j.get('rx_lon')], [j.get('tx_lat'),j.get('tx_lon')], [k.get('rx_lat'),k.get('rx_lon')], [k.get('tx_lat'),k.get('tx_lon')])
                         if (j.get('rx_lon') != k.get('rx_lon') or j.get('rx_lat') != k.get('rx_lat')) and (j.get('tx_lon') != k.get('tx_lon') or j.get('tx_lat') != k.get('tx_lat')) and (j.get('rx_lon') != k.get('tx_lon') or j.get('rx_lat') != k.get('tx_lat')) and (j.get('tx_lon') != k.get('rx_lon') or j.get('tx_lat') != k.get('rx_lat')):
-                            if abs(j.get('rx_lon')-j.get('tx_lon')) > abs(point[1]-j.get('rx_lon')) and abs(j.get('rx_lon')-j.get('tx_lon')) > abs(point[1]-j.get('tx_lon')) and abs(k.get('rx_lon')-k.get('tx_lon')) > abs(point[1]-k.get('rx_lon')) and abs(k.get('rx_lon')-k.get('tx_lon')) > abs(point[1]-k.get('tx_lon')):
-                                #adding new openspot
+                            if shortest_hdist(j.get('rx_lon'), j.get('tx_lon'), [-180, 180]) > abs(point[1]-j.get('rx_lon')) and shortest_hdist(j.get('rx_lon'), j.get('tx_lon'), [-180, 180]) > abs(point[1]-j.get('tx_lon')) and abs(k.get('rx_lon')-k.get('tx_lon')) > abs(point[1]-k.get('rx_lon')) and abs(k.get('rx_lon')-k.get('tx_lon')) > abs(point[1]-k.get('tx_lon')) and shortest_hdist(k.get('rx_lon'), k.get('tx_lon'), [-180, 180]) > abs(point[1]-k.get('rx_lon')) and shortest_hdist(k.get('rx_lon'), k.get('tx_lon'), [-180, 180]) > abs(point[1]-k.get('tx_lon')) and abs(k.get('rx_lon')-k.get('tx_lon')) > abs(point[1]-k.get('rx_lon')) and abs(k.get('rx_lon')-k.get('tx_lon')) > abs(point[1]-k.get('tx_lon')):
+                                #adding point
                                 p.append([point[0],point[1],j,k])
                                 
-                            elif abs(j.get('rx_lon')-j.get('tx_lon')) > abs(point[3]-j.get('rx_lon')) and abs(j.get('rx_lon')-j.get('tx_lon')) > abs(point[3]-j.get('tx_lon')) and abs(k.get('rx_lon')-k.get('tx_lon')) > abs(point[3]-k.get('rx_lon')) and abs(k.get('rx_lon')-k.get('tx_lon')) > abs(point[3]-k.get('tx_lon')):
-                                #adding new openspot
+                            if shortest_hdist(j.get('rx_lon'), j.get('tx_lon'), [-180, 180]) > abs(point[3]-j.get('rx_lon')) and shortest_hdist(j.get('rx_lon'), j.get('tx_lon'), [-180, 180]) > abs(point[3]-j.get('tx_lon')) and abs(k.get('rx_lon')-k.get('tx_lon')) > abs(point[3]-k.get('rx_lon')) and abs(k.get('rx_lon')-k.get('tx_lon')) > abs(point[3]-k.get('tx_lon')) and shortest_hdist(k.get('rx_lon'), k.get('tx_lon'), [-180, 180]) > abs(point[3]-k.get('rx_lon')) and shortest_hdist(k.get('rx_lon'), k.get('tx_lon'), [-180, 180]) > abs(point[3]-k.get('tx_lon')) and abs(k.get('rx_lon')-k.get('tx_lon')) > abs(point[3]-k.get('rx_lon')) and abs(k.get('rx_lon')-k.get('tx_lon')) > abs(point[3]-k.get('tx_lon')):
+                                #adding point
                                 p.append([point[2],point[3],j,k])
-                                
+                #adding new openspot              
                 o.add(j,key = comp)
     
     print("intersect_point,",time.process_time()-st)
