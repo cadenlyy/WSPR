@@ -24,7 +24,7 @@ c = "2024-09-01 03:00:00"#timestamp of plot
 
 a = process.anomalies(pf,MR,ssT,s,e)
 
-
+# plot for multiple time stamps
 for m in range(0,60,2):
     if(m < 10):
         c = '2024-09-01 03:0'+str(m)+':00'

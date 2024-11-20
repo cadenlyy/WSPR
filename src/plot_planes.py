@@ -76,23 +76,17 @@ def fdrawgreatcircle(maplength,p1_lon, p1_lat,p2_lon,p2_lat, m, linewidth = 1, c
         m.drawgreatcircle(lon1, lat1, lon2, lat2, linewidth = linewidth, c = c, zorder = zorder)
             
 #plot greatcircle for all data points
-def plotgreatcircle_abnomaly(t, m):
-    for i in t:
-        if(int(i[8]) != int(i[12])+1 and int(i[8]) != int(i[12])-1 and int(i[8]) != int(i[12])):
-            m.drawgreatcircle(i[8], i[7], i[12], i[11],  linewidth = 0.01, c = "red")
+
 
 def p(f,c,t,lat1,lon1,lat2,lon2):#draw map and all plots
     st = time.process_time()
-    #spots
-    
-    #plotgreatcircle_abnomal(t)
-    
+    #making map
     plt.figure(figsize=(100,60))
     m = Basemap(projection='cyl',llcrnrlat=lat1,urcrnrlat=lat2,
                 llcrnrlon=lon1,urcrnrlon=lon2,resolution='c')
     
     m.drawcoastlines(linewidth=5)
-   # map.drawmapboundary()
+    #map.drawmapboundary()
     
     m.drawmeridians(np.arange(0,360,30))
     m.drawparallels(np.arange(-90,90,30))
@@ -105,7 +99,7 @@ def p(f,c,t,lat1,lon1,lat2,lon2):#draw map and all plots
     
     #one.plot()
    
-    
+    #ploting anomalies
     for i in t:
         if f == 'a':
             if c == i.get('time') and c == i.get('time'):
@@ -132,14 +126,14 @@ def p(f,c,t,lat1,lon1,lat2,lon2):#draw map and all plots
                 plt.plot([i[2].get('rx_lon'),i[2].get('tx_lon'),i[3].get('rx_lon'),i[3].get('tx_lon')],[i[2].get('rx_lat'),i[2].get('tx_lat'),i[3].get('rx_lat'),i[3].get('tx_lat')], linestyle='None', marker=".", markersize=50, c = 'green',zorder=2)
                 
                 #print(i)
-
+                
     plt.title(f+c, fontsize = 100)
+    #saving plot as img
     plt.savefig("C:/Users/Lyiyang1/Desktop/wspr/data/plot/"+f+"/"+c[0:10]+'_'+c[11:13]+'-'+c[14:16]+'-'+c[17:19]+'_'+str(lat1)+'_'+str(lon1)+'_'+str(lat2)+'_'+str(lon2)+".png", format="png", dpi=100)
     plt.show()
-    plt.clf()
+    plt.clf()#clear plot
     
-
-    print("plot,",time.process_time()-st)
+    print("plot,",time.process_time()-st)#check is slow
     
 if __name__ == "__main__":  
     ts = datetime.datetime(2024,9,1,0,0,0) #Y,M,D,h,m,s

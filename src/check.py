@@ -18,7 +18,7 @@ class ordered_list:#list but all items are ordered
             high = len(self.items)-1
         if len(self.items) == 0:#check if empty
             self.items.append(v)
-        
+        #BSTA
         elif high >= low:#check if done searching
             mid = (high + low) // 2
             if self.items[mid] == v:#check if found same value
@@ -94,22 +94,13 @@ def first_node(a):#find higher node in a spot
         return a.get('rx_lat')
     return a.get('tx_lat')
 
-def last_node(a):
+def last_node(a):#find lower node in a spot
     if a.get('rx_lat') < a.get('tx_lat'):
         return a.get('rx_lat')
     return a.get('tx_lat')
             
 def comp(arr,a,b):#comparator or spot data structure
-    #find lower nodes
-    if arr[a].get('rx_lat') < arr[a].get('tx_lat'):
-        ov = arr[a].get('rx_lat')
-    else:
-        ov = arr[a].get('tx_lat')
-    if b.get('rx_lat') < b.get('tx_lat'):
-        nv = b.get('rx_lat')
-    else:
-        nv = b.get('tx_lat')
-    return ov < nv #return if old node is higher
+    return last_node(arr[a]) < last_node(b) #return if old node is higher
 
 def shortest_hdist(lon1,lon2,maplength):
     l = min(lon1,lon2)
