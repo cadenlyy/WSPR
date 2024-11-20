@@ -21,7 +21,7 @@ def ss(v, m, sd):#calculate standard score
         return (v-m)/sd
     return 0
     
-def print_csv(t, ts, te, MR, data, rx = None, tx = None):#output to csv file
+def print_csv(t, ts, te, MR, ssT, data, rx = None, tx = None):#output to csv file
     st = time.process_time()    
     #check or one pair or multiple    
     if rx == None:
@@ -34,7 +34,7 @@ def print_csv(t, ts, te, MR, data, rx = None, tx = None):#output to csv file
         tx = '_'+tx
     #file path and nameing
     base_dir = "C:/Users/Lyiyang1/Desktop/wspr/data/csv"
-    filename = t+rx+tx+'_'+ts.strftime("%Y-%m-%d_%H-%M-%S")+'_'+te.strftime("%Y-%m-%d_%H-%M-%S")+'_'+str(MR).split(':')[0]+'-'+str(MR).split(':')[1]+'-'+str(MR).split(':')[2]+'.csv' #type_rx_tx_ts_te_MR.csv
+    filename = t+rx+tx+'_'+ts.strftime("%Y-%m-%d_%H-%M-%S")+'_'+te.strftime("%Y-%m-%d_%H-%M-%S")+'_'+str(MR).split(':')[0]+'-'+str(MR).split(':')[1]+'-'+str(MR).split(':')[2]+'_'+ssT+'.csv' #type_rx_tx_ts_te_MR.csv
     abs_file = os.path.join(base_dir, filename)
     
     #writing to csv file
@@ -46,7 +46,7 @@ def print_csv(t, ts, te, MR, data, rx = None, tx = None):#output to csv file
     print('print_csv,',time.process_time()-st)
         
 #main processing and calculation of anomalous data
-def anomalies(f, MR, ts, te, rx = None, tx = None):
+def anomalies(f, MR, ssT, ts, te, rx = None, tx = None):
     st = time.process_time()
     #wspr query
     #id, time, band, rx_sign, rx_lat, rx_lon, rx_loc, tx_sign, tx_lat, tx_lon, tx_loc, distance, azimuth, rx_azimuth, *frequency, power, *snr, *drift, version, code
@@ -159,7 +159,6 @@ def anomalies(f, MR, ts, te, rx = None, tx = None):
             
     #calculating standard score and detecting abnormallies
     a = []#anomalies
-    ssT = 1#minimum standard score to be considered an anomaly
     for r in transmitions.items():#recievers
         for c in r[1].items():#transmitters
             for t in c[1].items():#bands
@@ -177,7 +176,7 @@ def anomalies(f, MR, ts, te, rx = None, tx = None):
                                 p = transmitions.get(r[0]).get(c[0]).get(t[0]).get(i[0])[0][0]
                                 a.append({'SS_freq': p[0], 'SS_snr': p[1], 'SS_drift': p[2], 'id': p[3], 'time': p[4], 'band': p[5], 'rx_sign': p[6], 'rx_lat': p[7], 'rx_lon': p[8], 'rx_loc': p[9], 'tx_sign': p[10], 'tx_lat': p[11], 'tx_lon': p[12], 'tx_loc': p[13], 'distance': p[14], 'azimuth': p[15], 'rx_azimuth': p[16], 'frequency': p[17], 'power': p[18], 'snr': p[19], 'drift': p[20], 'version': p[21], 'code': p[22]})
                                 
-    #print_csv('all',ts,te,MR,a)
+    #print_csv('all',ts,te,MR,ssT,a)
     
     #print(a)
     print("anomalies,",time.process_time()-st)#checking code speed
