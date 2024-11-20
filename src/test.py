@@ -1,18 +1,53 @@
+from mpl_toolkits.basemap import Basemap
+import matplotlib.pyplot as plt
+import numpy as np
 import check
 
-p=[]
+map = Basemap(projection='cyl',llcrnrlat=-90,urcrnrlat=90,
+            llcrnrlon=-180,urcrnrlon=180,resolution='c')
 
-j = {'SS_freq': -348619.2288304247, 'SS_snr': 29.677178697402976, 'SS_drift': 0, 'id': '8256616381', 'time': '2024-09-01 03:52:00', 'band': 18, 'rx_sign': 'VK5TC', 'rx_lat': -35.062, 'rx_lon': 138.542, 'rx_loc': 'PF94gw', 'tx_sign': 'VK4BA', 'tx_lat': -27.521, 'tx_lon': 152.958, 'tx_loc': 'QG62', 'distance': 1604, 'azimuth': 235, 'rx_azimuth': 62, 'frequency': 18106186, 'power': 23, 'snr': -23, 'drift': 0, 'version': '2.6.1', 'code': 1}
-k = {'SS_freq': -5993775.392985822, 'SS_snr': 46.565621163477765, 'SS_drift': 19527068.560821768, 'id': '8256619589', 'time': '2024-09-01 03:52:00', 'band': 21, 'rx_sign': 'KFS/SW', 'rx_lat': 37.396, 'rx_lon': -122.375, 'rx_loc': 'CM87tj', 'tx_sign': 'ZL3TKI', 'tx_lat': -43.562, 'tx_lon': 172.625, 'tx_loc': 'RE66hk', 'distance': 11130, 'azimuth': 47, 'rx_azimuth': 221, 'frequency': 21096101, 'power': 23, 'snr': -3, 'drift': 0, 'version': 'WD_3.2.2', 'code': 1}
+def fdrawgreatcircle(maplength,p1_lon, p1_lat,p2_lon,p2_lat, linewidth = 1, c = 'red', zorder = 1):
+    
+    #checking for left most node
+    if p1_lon > p2_lon:
+        lat1 = p2_lat
+        lon1 = p2_lon
+        lat2 = p1_lat
+        lon2 = p1_lon
+    else:
+        lat1 = p1_lat
+        lon1 = p1_lon
+        lat2 = p2_lat
+        lon2 = p2_lon
+    #check if it crosses boarder of map
+    if lon1-maplength[0]+maplength[1]-lon2 <= lon2-lon1:
+        lmp = check.intersect_greatcircle([lat1, lon1], [lat2,lon2], [-90, maplength[0]], [90, maplength[0]])
+        rmp = check.intersect_greatcircle([lat1, lon1], [lat2,lon2], [-90, maplength[1]], [90, maplength[1]])
+        if lmp[1] == maplength[0]:
+            if abs(lat1 - lmp[0]) < 1 and abs(lon1 - lmp[1]) < 3:
+                lat1+=1
+            map.drawgreatcircle(lon1, lat1, lmp[1], lmp[0], linewidth = linewidth, c = c, zorder = zorder)
+        else:
+            if abs(lat1 - lmp[2]) < 1 and abs(lon1 - lmp[3]) < 3:
+                lat1+=1
+            map.drawgreatcircle(lon1, lat1, lmp[3], lmp[2], linewidth = linewidth, c = c, zorder = zorder)
+        if lmp[1] == maplength[0]:
+            if abs(lat2 - rmp[0]) < 1 and abs(lon2 - rmp[1]) < 3:
+                lat2+=1
+            map.drawgreatcircle(lon2, lat2, rmp[1], rmp[0], linewidth = linewidth, c = c, zorder = zorder)
+        else:
+            if abs(lat2 - rmp[2]) < 1 and abs(lon2 - rmp[3]) < 3:
+                lat2+=1
+            map.drawgreatcircle(lon2, lat2, rmp[3], rmp[2], linewidth = linewidth, c = c, zorder = zorder)
+    else:
+        if abs(lat1 - lat2) < 1 and abs(lon1 - lon2) < 3:
+            lat1+=1
+        map.drawgreatcircle(lon1, lat1, lon2, lat2, linewidth = linewidth, c = c, zorder = zorder)
 
-#point = [-36.00519045246581, 54.121659809004115, 36.00519045246581, -125.8783401909959]
-point = check.intersect_greatcircle([j.get('rx_lat'),j.get('rx_lon')], [j.get('tx_lat'),j.get('tx_lon')], [k.get('rx_lat'),k.get('rx_lon')], [k.get('tx_lat'),k.get('tx_lon')])
-if check.shortest_hdist(j.get('rx_lon'), k.get('rx_lon'), [-180, 180]) > abs(point[1]-j.get('rx_lon')) and check.shortest_hdist(j.get('rx_lon'), k.get('rx_lon'), [-180, 180]) > abs(point[1]-j.get('tx_lon')) and abs(k.get('rx_lon')-k.get('tx_lon')) > abs(point[1]-k.get('rx_lon')) and abs(k.get('rx_lon')-k.get('tx_lon')) > abs(point[1]-k.get('tx_lon')):
-    #adding new openspot
-    p.append([point[0],point[1],j,k])
-    
-elif check.shortest_hdist(j.get('rx_lon'), k.get('rx_lon'), [-180, 180]) > abs(point[3]-j.get('rx_lon')) and check.shortest_hdist(j.get('rx_lon'), k.get('rx_lon'), [-180, 180]) > abs(point[3]-j.get('tx_lon')) and abs(k.get('rx_lon')-k.get('tx_lon')) > abs(point[3]-k.get('rx_lon')) and abs(k.get('rx_lon')-k.get('tx_lon')) > abs(point[3]-k.get('tx_lon')):
-    #adding new openspot
-    p.append([point[2],point[3],j,k])
-    
-print(p)
+p1_lat1 = 48.563
+p1_long1 = 9.875
+p1_lat2 = 48.354
+p1_long2 = 9.875
+
+
+fdrawgreatcircle([-180,180],p1_long1, p1_lat1, p1_long2, p1_lat2, linewidth = 1)

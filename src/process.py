@@ -22,6 +22,7 @@ def ss(v, m, sd):#calculate standard score
     return 0
     
 def print_csv(t, ts, te, MR, data, rx = None, tx = None):#output to csv file
+    st = time.process_time()    
     #check or one pair or multiple    
     if rx == None:
         rx = ''
@@ -42,7 +43,7 @@ def print_csv(t, ts, te, MR, data, rx = None, tx = None):#output to csv file
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(data)
-       
+    print('print_csv,',time.process_time()-st)
         
 #main processing and calculation of anomalous data
 def anomalies(f, MR, ts, te, rx = None, tx = None):

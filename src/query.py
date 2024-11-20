@@ -3,6 +3,7 @@ import json
 import time
 import os
 import datetime
+import process
 
 #   name             type
 #|id        |UInt64                |
@@ -39,7 +40,7 @@ def wsprlive_get(col, database, ts, te, rx = None, tx = None, l=None): #colums, 
     if l != None:
         q += " Limit " + str(l)
         
-    url = "https://db1.wspr.live/?query=" + urllib.parse.quote_plus(q + " FORMAT JSON")
+    url = "https://db1.wspr.live/?query=" + urllib.parse.quote_plus(q + " AND rx_lon < '15' AND rx_lon > '-15' " + " FORMAT JSON")
       
     # download contents from wspr.live
     contents = urllib.request.urlopen(url).read()
@@ -99,8 +100,10 @@ def wspr_to_json(t, ts, te, MR, rx = None, tx = None):
 
 if __name__ == "__main__":
     #print(wsprlive_get("*", "rx", '2024-09-01 00:00:00', '2024-09-01 07:00:00'))
-    s = datetime.datetime(2024,9,1,0,0,0) #Y,M,D,h,m,s
-    e = datetime.datetime(2024,9,1,7,0,0)
+    s = datetime.datetime(2024,9,2,20,0,0) #Y,M,D,h,m,s
+    e = datetime.datetime(2024,9,3,0,0,0)
     MR = datetime.timedelta(minutes = 180)
     
-    wspr_to_json('all', s, e, MR)
+    process.print_csv('all_UTC',s,e,MR,wsprlive_get("*", "rx", str(s), str(e)))
+    
+    #wspr_to_json('all', s, e, MR)
