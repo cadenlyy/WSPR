@@ -18,7 +18,7 @@ class ordered_list:#list but all items are ordered
             high = len(self.items)-1
         if len(self.items) == 0:#check if empty
             self.items.append(v)
-        #BSTA
+        #Binary search
         elif high >= low:#check if done searching
             mid = (high + low) // 2
             if self.items[mid] == v:#check if found same value
@@ -149,8 +149,9 @@ def intersect_point(d):#list of dict with SS_freq, SS_snr,SS_drift,id, time, ban
     s = datetime.datetime(2024,9,1,0,0,0) #Y,M,D,h,m,s
     e = datetime.datetime(2024,9,1,7,0,0)
     MR = datetime.timedelta(minutes = 180)
+    ssT = 1
     
-    query.print_json('all_points',s,e,MR,p)
+    query.print_json('all','a',s,e,p,MR,ssT)
     
     return p
                     
@@ -161,11 +162,12 @@ if __name__ == "__main__":
     s = datetime.datetime(2024,9,1,0,0,0) #Y,M,D,h,m,s
     e = datetime.datetime(2024,9,1,7,0,0)
     MR = datetime.timedelta(minutes = 180)
+    ssT = 1
     
     #intersect_greatcircle([10,-70],[10,70],[10,-70],[10,-70])
     
     #A = [{'SS_freq': 1, 'SS_snr': 1, 'SS_drift': 1, 'id': '8100420947', 'time': '2024-07-24 09:26:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 1, 'power': 23, 'snr': 1, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'SS_freq': 1, 'SS_snr': 1, 'SS_drift': 1, 'id': '8100420947', 'time': '2024-07-24 09:26:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 2, 'power': 23, 'snr': -7, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'SS_freq': 1, 'SS_snr': 1, 'SS_drift': 1, 'id': '8100420947', 'time': '2024-07-24 09:28:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 1000000000000000000000000, 'power': 23, 'snr': 3, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'SS_freq': 1, 'SS_snr': 1, 'SS_drift': 1, 'id': '8100420947', 'time': '2024-07-24 09:30:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 4, 'power': 23, 'snr': -10, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1}]
-    A = process.anomalies('r', MR, s, e)
+    A = process.anomalies('r', MR, ssT, s, e)
     
     #print(intersect_point([{'SS_freq': 1, 'SS_snr': 1, 'SS_drift': 1, 'id': '8100420947', 'time': '2024-09-01 02:00:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': -80, 'rx_lon': -80, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 80, 'tx_lon': 80, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 1, 'power': 23, 'snr': 1, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'SS_freq': 1, 'SS_snr': 1, 'SS_drift': 1, 'id': '8100420947', 'time': '2024-09-01 02:00:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': -80, 'rx_lon': -75, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 80, 'tx_lon': 80, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 1, 'power': 23, 'snr': 1, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1}]))
     intersect_point(A)
