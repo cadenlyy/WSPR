@@ -8,8 +8,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 #processing details
-s = datetime.datetime(2024,9,1,0,0,0) #Y,M,D,h,m,s
-e = datetime.datetime(2024,9,1,7,0,0)
+s = datetime.datetime(2024,11,21,8,10,0) #Y,M,D,h,m,s
+e = datetime.datetime(2024,11,21,8,20,0)
 MR = datetime.timedelta(minutes = 180)
 ssT = 0
 pf = 'r'#r(read from json), t(test case)
@@ -26,11 +26,11 @@ a = process.anomalies(pf,MR,ssT,s,e)
 #p = check.intersect_point(a)
 
 # plot for multiple time stamps
-for m in range(0,60,2):
+for m in range(10,22,2):
     if(m < 10):
-        c = '2024-09-01 03:0'+str(m)+':00'
+        c = '2024-10-01 03:0'+str(m)+':00'
     else:
-        c = '2024-09-01 03:'+str(m)+':00'
+        c = '2024-10-01 03:'+str(m)+':00'
     plot_planes.p(a,mf,c, MR, ssT, lat1, lon1, lat2, lon2)
 
 #query.wspr_to_json('all', s, e, MR, 'KL3RR', 'VE7AHT')
