@@ -80,88 +80,67 @@ def anomalies(f, MR, ssT, ts, te, rx = None, tx = None):
         if transmitions.get(tuple(data[3:7])).get(tuple(data[7:11])) == None:
             transmitions.get(tuple(data[3:7])).update({tuple(data[7:11]):{}})
         #adding new time
-        if transmitions.get(tuple(data[3:7])).get(tuple(data[7:11])).get(data[2]) == None:
-            transmitions.get(tuple(data[3:7])).get(tuple(data[7:11])).update({data[2]:{}})
-        if transmitions.get(tuple(data[3:7])).get(tuple(data[7:11])).get(data[2]).get(data[1]) == None:
-            transmitions.get(tuple(data[3:7])).get(tuple(data[7:11])).get(data[2]).update({data[1]:[[],[0,0,0,0,0,0,None,None,None,None,None,None,None,[None,None,None,None,None,None]]]}) #[sum:freq,snr,drift,sum:freq^2,snr^2,drift^2,mean:freq,snr,drift,SD:freq,snr,drift,numOfSpots,sliding window]
+        if transmitions.get(tuple(data[3:7])).get(tuple(data[7:11])).get(data[1]) == None:
+            transmitions.get(tuple(data[3:7])).get(tuple(data[7:11])).update({data[1]:[[],[0,0,None,None,None,[None,None]]]}) #[sum_snr,sum_snr^2,mean_snr,SD_snr,numOfSpots,sliding window]
         #pushing in transmittion info                                    
-        transmitions.get(tuple(data[3:7])).get(tuple(data[7:11])).get(data[2]).get(data[1])[0].append([0,0,0]+data)#SS_freq,SS_snr,SS_drift,id, time, band, rx_sign, rx_lat, rx_lon, rx_loc, tx_sign, tx_lat, tx_lon, tx_loc, distance, azimuth, rx_azimuth, *frequency, power, *snr, *drift, version, code
+        transmitions.get(tuple(data[3:7])).get(tuple(data[7:11])).get(data[1])[0].append([0]+data)#SS_snr,id, time, band, rx_sign, rx_lat, rx_lon, rx_loc, tx_sign, tx_lat, tx_lon, tx_loc, distance, azimuth, rx_azimuth, *frequency, power, *snr, *drift, version, code
     
-        #calculating sum for freq, SNR and drift
-        transmitions.get(tuple(data[3:7])).get(tuple(data[7:11])).get(data[2]).get(data[1])[1][0]+=data[14]
-        transmitions.get(tuple(data[3:7])).get(tuple(data[7:11])).get(data[2]).get(data[1])[1][1]+=data[16]
-        transmitions.get(tuple(data[3:7])).get(tuple(data[7:11])).get(data[2]).get(data[1])[1][2]+=data[17]
+        #calculating sum SNR
+        transmitions.get(tuple(data[3:7])).get(tuple(data[7:11])).get(data[1])[1][0]+=data[16]
     
         #calculating sum for freq^2, SNR^2 and drift^2
-        transmitions.get(tuple(data[3:7])).get(tuple(data[7:11])).get(data[2]).get(data[1])[1][3]+=data[14]**2
-        transmitions.get(tuple(data[3:7])).get(tuple(data[7:11])).get(data[2]).get(data[1])[1][4]+=data[16]**2
-        transmitions.get(tuple(data[3:7])).get(tuple(data[7:11])).get(data[2]).get(data[1])[1][5]+=data[17]**2
+        transmitions.get(tuple(data[3:7])).get(tuple(data[7:11])).get(data[1])[1][1]+=data[16]**2
 
     #sliding(only actually going through each spot once so still O(N))   
     for r in transmitions.items():# receivers
-        for c in r[1].items():#transmitters
-            for t in c[1].items():#band
-                numOfSpots = 0
-                left = 0
-                right = 0
-                ft = list(t[1])[0]#time of first spot
-                lt = list(t[1])[-1]#time of last spot
-                slidingWindow = [0,0,0,0,0,0]#sum:freq,snr,drift,sum:freq^2,snr^2,drift^2
-                for i in range(0, len(t[1])):#time
-                    #adding still MR away from start time
-                    if datetime.datetime.strptime(list(t[1])[i], '%Y-%m-%d %H:%M:%S') - datetime.datetime.strptime(ft, '%Y-%m-%d %H:%M:%S') < MR:                 
-                        slidingWindow[0] += t[1].get(list(t[1])[i])[1][0]
-                        slidingWindow[1] += t[1].get(list(t[1])[i])[1][1]
-                        slidingWindow[2] += t[1].get(list(t[1])[i])[1][2]
-                        slidingWindow[3] += t[1].get(list(t[1])[i])[1][3]
-                        slidingWindow[4] += t[1].get(list(t[1])[i])[1][4]
-                        slidingWindow[5] += t[1].get(list(t[1])[i])[1][5]
-                        numOfSpots += len(t[1].get(list(t[1])[i])[0])
-                        right = i+1
-                    #end when less then MR to end time
-                    elif datetime.datetime.strptime(lt, '%Y-%m-%d %H:%M:%S') - datetime.datetime.strptime(list(t[1])[i], '%Y-%m-%d %H:%M:%S') < MR:
-                        break
-                    else:
-                        #subtracting back of sliding window will within MR
-                        for j in  range(left, i+1):
-                            if datetime.datetime.strptime(list(t[1])[i], '%Y-%m-%d %H:%M:%S') - datetime.datetime.strptime(list(t[1])[j], '%Y-%m-%d %H:%M:%S') > MR:
-                                slidingWindow[0] -= t[1].get(list(t[1])[j])[1][0]
-                                slidingWindow[1] -= t[1].get(list(t[1])[j])[1][1]
-                                slidingWindow[2] -= t[1].get(list(t[1])[j])[1][2]
-                                slidingWindow[3] -= t[1].get(list(t[1])[j])[1][3]
-                                slidingWindow[4] -= t[1].get(list(t[1])[j])[1][4]
-                                slidingWindow[5] -= t[1].get(list(t[1])[j])[1][5]
-                                numOfSpots -= len(t[1].get(list(t[1])[j])[0])
-                            else:
-                                left = j
-                                break
-                        #adding from of sliding window until MR
-                        for j in  range(right, len(t[1])):
-                            if datetime.datetime.strptime(list(t[1])[j], '%Y-%m-%d %H:%M:%S') - datetime.datetime.strptime(list(t[1])[i], '%Y-%m-%d %H:%M:%S') <= MR or j == len(c[1])-1:
-                                slidingWindow[0] += t[1].get(list(t[1])[j])[1][0]
-                                slidingWindow[1] += t[1].get(list(t[1])[j])[1][1]
-                                slidingWindow[2] += t[1].get(list(t[1])[j])[1][2]
-                                slidingWindow[3] += t[1].get(list(t[1])[j])[1][3]
-                                slidingWindow[4] += t[1].get(list(t[1])[j])[1][4]
-                                slidingWindow[5] += t[1].get(list(t[1])[j])[1][5]
-                                numOfSpots += len(t[1].get(list(t[1])[j])[0])
-                            else:
-                                right = j
-                                break
-                        #mean
-                        #print(transmitions.get(r[0]).get(c[0]).get(t[0]).get(list(t[1])[i]))
-                        transmitions.get(r[0]).get(c[0]).get(t[0]).get(list(t[1])[i])[1][6] = slidingWindow[0]/numOfSpots
-                        transmitions.get(r[0]).get(c[0]).get(t[0]).get(list(t[1])[i])[1][7] = slidingWindow[1]/numOfSpots
-                        transmitions.get(r[0]).get(c[0]).get(t[0]).get(list(t[1])[i])[1][8] = slidingWindow[2]/numOfSpots
-                        #SD
-                        transmitions.get(r[0]).get(c[0]).get(t[0]).get(list(t[1])[i])[1][9] = SD(slidingWindow[3],slidingWindow[0]/numOfSpots,numOfSpots)
-                        transmitions.get(r[0]).get(c[0]).get(t[0]).get(list(t[1])[i])[1][10] = SD(slidingWindow[4],slidingWindow[1]/numOfSpots,numOfSpots)
-                        transmitions.get(r[0]).get(c[0]).get(t[0]).get(list(t[1])[i])[1][11] = SD(slidingWindow[5],slidingWindow[2]/numOfSpots,numOfSpots)
-
-                        #numofspots
-                        transmitions.get(r[0]).get(c[0]).get(t[0]).get(list(t[1])[i])[1][12] = numOfSpots
-                        #sliding window
-                        transmitions.get(r[0]).get(c[0]).get(t[0]).get(list(t[1])[i])[1][13] = copy.deepcopy(slidingWindow)
+        for t in r[1].items():#transmitters
+            numOfSpots = 0
+            left = 0
+            right = 0
+            ft = list(t[1])[0]#time of first spot
+            lt = list(t[1])[-1]#time of last spot
+            slidingWindow = [0,0,0,0,0,0]#sum:freq,snr,drift,sum:freq^2,snr^2,drift^2
+            for i in range(0, len(t[1])):#time
+                #adding still MR away from start time
+                if datetime.datetime.strptime(list(t[1])[i], '%Y-%m-%d %H:%M:%S') - datetime.datetime.strptime(ft, '%Y-%m-%d %H:%M:%S') < MR:                 
+                    slidingWindow[0] += t[1].get(list(t[1])[i])[1][0]
+                    slidingWindow[1] += t[1].get(list(t[1])[i])[1][1]
+                    numOfSpots += len(t[1].get(list(t[1])[i])[0])
+                    right = i+1
+                #end when less then MR to end time
+                elif datetime.datetime.strptime(lt, '%Y-%m-%d %H:%M:%S') - datetime.datetime.strptime(list(t[1])[i], '%Y-%m-%d %H:%M:%S') < MR:
+                    break
+                else:
+                    #subtracting back of sliding window will within MR
+                    for j in  range(left, i+1):
+                        if datetime.datetime.strptime(list(t[1])[i], '%Y-%m-%d %H:%M:%S') - datetime.datetime.strptime(list(t[1])[j], '%Y-%m-%d %H:%M:%S') > MR:
+                            slidingWindow[0] -= t[1].get(list(t[1])[j])[1][0]
+                            slidingWindow[1] -= t[1].get(list(t[1])[j])[1][1]
+                            numOfSpots -= len(t[1].get(list(t[1])[j])[0])
+                        else:
+                            left = j
+                            break
+                    #adding from of sliding window until MR
+                    for j in  range(right, len(t[1])):
+                        if datetime.datetime.strptime(list(t[1])[j], '%Y-%m-%d %H:%M:%S') - datetime.datetime.strptime(list(t[1])[i], '%Y-%m-%d %H:%M:%S') <= MR or j == len(r[1].items())-1:
+                            slidingWindow[0] += t[1].get(list(t[1])[j])[1][0]
+                            slidingWindow[1] += t[1].get(list(t[1])[j])[1][1]
+                            numOfSpots += len(t[1].get(list(t[1])[j])[0])
+                        else:
+                            right = j
+                            break
+                    #mean
+                    #print(transmitions.get(r[0]).get(c[0]).get(t[0]).get(list(t[1])[i]))
+                    transmitions.get(r[0]).get(t[0]).get(list(t[1])[i])[1][2] = slidingWindow[0]/numOfSpots
+                    
+                    #SD
+                    transmitions.get(r[0]).get(t[0]).get(list(t[1])[i])[1][3] = SD(slidingWindow[1],slidingWindow[0]/numOfSpots,numOfSpots)
+                    
+                    #numofspots
+                    transmitions.get(r[0]).get(t[0]).get(list(t[1])[i])[1][4] = numOfSpots
+                    
+                    #sliding window
+                    transmitions.get(r[0]).get(t[0]).get(list(t[1])[i])[1][5] = copy.deepcopy(slidingWindow)
 
 
             
@@ -169,32 +148,29 @@ def anomalies(f, MR, ssT, ts, te, rx = None, tx = None):
     a = []#anomalies
     d = []#all data in csv printable format
     for r in transmitions.items():#recievers
-        for c in r[1].items():#transmitters
-            for t in c[1].items():#bands
-                for i in t[1].items():#times
-                    for j in range(len(i[1][0])):#data of each spot
-                        #checking if within MR and has valid values to calculate
-                        if i[1][1][6] != None and i[1][1][7] != None and i[1][1][8] != None and i[1][1][9] != None and i[1][1][10] != None and i[1][1][11] != None:
-                            #adding standard score
-                            transmitions.get(r[0]).get(c[0]).get(t[0]).get(i[0])[0][j][0] = ss(i[1][0][j][17],i[1][1][6],i[1][1][9])
-                            transmitions.get(r[0]).get(c[0]).get(t[0]).get(i[0])[0][j][1] = ss(i[1][0][j][19],i[1][1][7],i[1][1][10])
-                            transmitions.get(r[0]).get(c[0]).get(t[0]).get(i[0])[0][j][2] = ss(i[1][0][j][20],i[1][1][8],i[1][1][11])
-                            #checking for anomalies
-                            if abs(ss(i[1][0][j][17],i[1][1][6],i[1][1][9]))  >= ssT or abs(ss(i[1][0][j][19],i[1][1][7],i[1][1][10]))  >= ssT or abs(ss(i[1][0][j][20],i[1][1][8],i[1][1][11]))  >= ssT:
-                                #copying anomalies
-                                p = i[1][0][j]
-                                a.append({'SS_freq': p[0], 'SS_snr': p[1], 'SS_drift': p[2], 'id': p[3], 'time': p[4], 'band': p[5], 'rx_sign': p[6], 'rx_lat': p[7], 'rx_lon': p[8], 'rx_loc': p[9], 'tx_sign': p[10], 'tx_lat': p[11], 'tx_lon': p[12], 'tx_loc': p[13], 'distance': p[14], 'azimuth': p[15], 'rx_azimuth': p[16], 'frequency': p[17], 'power': p[18], 'snr': p[19], 'drift': p[20], 'version': p[21], 'code': p[22]})
-                        d.append({'SS_freq': i[1][0][j][0], 'SS_snr': i[1][0][j][1], 'SS_drift': i[1][0][j][2], 'id': i[1][0][j][3], 'time': i[1][0][j][4], 'band': i[1][0][j][5], 'rx_sign': i[1][0][j][6], 'rx_lat': i[1][0][j][7], 'rx_lon': i[1][0][j][8], 'rx_loc': i[1][0][j][9], 'tx_sign': i[1][0][j][10], 'tx_lat': i[1][0][j][11], 'tx_lon': i[1][0][j][12], 'tx_loc': i[1][0][j][13], 'distance': i[1][0][j][14], 'azimuth': i[1][0][j][15], 'rx_azimuth': i[1][0][j][16], 'frequency': i[1][0][j][17], 'power': i[1][0][j][18], 'snr': i[1][0][j][19], 'drift': i[1][0][j][20], 'version': i[1][0][j][21], 'code': i[1][0][j][22], "sum_freq": i[1][1][0],"sum_snr": i[1][1][1],"sum_drift": i[1][1][2],"sum_freq^2": i[1][1][3],"sum_snr^2": i[1][1][4],"sum_drift^2":i[1][1][5],"mean_freq":i[1][1][6],"mean_snr":i[1][1][7],"mean_drift":i[1][1][8],"SD_freq":i[1][1][9],"SD_snr":i[1][1][10],"SD_drift":i[1][1][11],"numOfSpots":i[1][1][12],"SW_freq":i[1][1][13][0],"SW_snr":i[1][1][13][1],"SW_drift":i[1][1][13][2],"SW_freq^2":i[1][1][13][3],"SW_snr^2":i[1][1][13][4],"SW_drift^2":i[1][1][13][5]})
+        for t in r[1].items():#transmitters
+            for i in t[1].items():#times
+                for j in range(len(i[1][0])):#data of each spot
+                    #checking if within MR and has valid values to calculate
+                    if i[1][1][2] != None and i[1][1][3] != None:
+                        #adding standard score
+                        transmitions.get(r[0]).get(t[0]).get(i[0])[0][j][0] = ss(i[1][0][j][17],i[1][1][2],i[1][1][3])
+                        #checking for anomalies
+                        if ss(i[1][0][j][17],i[1][1][2],i[1][1][3]) >= ssT:
+                            #copying anomalies
+                            p = i[1][0][j]
+                            a.append({'SS_snr': p[0], 'id': p[1], 'time': p[2], 'band': p[3], 'rx_sign': p[4], 'rx_lat': p[5], 'rx_lon': p[6], 'rx_loc': p[7], 'tx_sign': p[8], 'tx_lat': p[9], 'tx_lon': p[10], 'tx_loc': p[11], 'distance': p[12], 'azimuth': p[13], 'rx_azimuth': p[14], 'frequency': p[15], 'power': p[16], 'snr': p[17], 'drift': p[18], 'version': p[19], 'code': p[20]})
+                    d.append({'SS_snr': i[1][0][j][0], 'id': i[1][0][j][1], 'time': i[1][0][j][2], 'band': i[1][0][j][3], 'rx_sign': i[1][0][j][4], 'rx_lat': i[1][0][j][5], 'rx_lon': i[1][0][j][6], 'rx_loc': i[1][0][j][7], 'tx_sign': i[1][0][j][8], 'tx_lat': i[1][0][j][9], 'tx_lon': i[1][0][j][10], 'tx_loc': i[1][0][j][11], 'distance': i[1][0][j][12], 'azimuth': i[1][0][j][13], 'rx_azimuth': i[1][0][j][14], 'frequency': i[1][0][j][15], 'power': i[1][0][j][16], 'snr': i[1][0][j][17], 'drift': i[1][0][j][18], 'version': i[1][0][j][19], 'code': i[1][0][j][20], "sum_snr": i[1][1][0], "sum_snr^2": i[1][1][1], "mean_snr":i[1][1][2], "SD_snr":i[1][1][3], "numOfSpots":i[1][1][4], "SW_snr":i[1][1][5][0], "SW_snr^2":i[1][1][5][1]})
 
-    #print_csv('all','t',ts,te,MR,ssT,d)
-    #print_csv('all','a',ts,te,MR,ssT,a)
+    print_csv('all','t',ts,te,MR,ssT,d)
+    print_csv('alla','a',ts,te,MR,ssT,a)
     #print_csv('pair','t',ts,te,MR,ssT,d,rx,tx)
     #print_csv('pair','a',ts,te,MR,ssT,a,rx,tx)
     
     #print(transmitions)
     print("anomalies,",time.process_time()-st)#checking code speed
     
-    return d
+    return a
 
 if __name__ == "__main__":
     #process details
