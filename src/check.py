@@ -5,6 +5,13 @@ import time
 import process
 import query
 
+#constants
+c = 299792458#m/s
+k = 1.38*10**-23#j/k
+t0 = 290#k
+B = 6
+
+
 crx = [-149.958, 61.146] #lon, lat
 ctx = [-155.04, 19.4792]
 ca = [-148.61223, 60.38938]#lon,lat
@@ -86,8 +93,21 @@ def intersect_greatcircle(A, B, C, D):#lat,lon
 
     # Print results
     return[i_lat1, i_long1, i_lat2, i_long2]
-        
+
+def lg(v):
+        return math.log(v,10)
     
+def RCS(h,l,a,f):
+    return 4 * math.pi * h**2 * l**2 * math.cos(a)**2 * f**2 / c**2
+
+def Dgc(r,lat1,lon1,lat2,lon2):
+    return r * math.acos(math.sin(lat1) * math.sin(lat2) + math.cos(lat1) * math.cos(lat2) * math.cos(lon1- lon2))
+
+def Dhtotal(Dgctotal,n,h):
+    return math.sqrt(Dgctotal + n**2 * h**2)
+
+def SNR(p,f,rcs,rtx,rrx,n):#power transmitted(dB), frequency transmitted, RCS of target, distance from tx to target, distance from rx to target, number of hops
+    return p + 40 * lg(c) - 40 * lg(f) + 10 * lg (rcs) - 50 * lg(4*math.pi) - 40 * lg(rtx)  - 40 * lg(rtx) - 10 * lg(k * t0 * B) - 5 * n
         
 def first_node(a):#find higher node in a spot
     if a.get('rx_lat') > a.get('tx_lat'):
@@ -108,7 +128,7 @@ def shortest_hdist(lon1,lon2,maplength):
     return min(r-l,l-maplength[0]+maplength[1]-r)
             
 #find points of intersection
-def intersect_point(d):#list of dict with SS_freq, SS_snr,SS_drift,id, time, band, rx_sign, rx_lat, rx_lon, rx_loc, tx_sign, tx_lat, tx_lon, tx_loc, distance, azimuth, rx_azimuth, *frequency, power, *snr, *drift, version, code
+def intersect_point_sp(d):#list of dict with SS_freq, SS_snr,SS_drift,id, time, band, rx_sign, rx_lat, rx_lon, rx_loc, tx_sign, tx_lat, tx_lon, tx_loc, distance, azimuth, rx_azimuth, *frequency, power, *snr, *drift, version, code
     st = time.process_time()    
     a = {}    
     #arranging by time
@@ -144,7 +164,7 @@ def intersect_point(d):#list of dict with SS_freq, SS_snr,SS_drift,id, time, ban
                 #adding new openspot              
                 o.add(j,key = comp)
     
-    print("intersect_point,",time.process_time()-st)
+    print("intersect_point_sp,",time.process_time()-st)
                 
     s = datetime.datetime(2024,9,1,0,0,0) #Y,M,D,h,m,s
     e = datetime.datetime(2024,9,1,7,0,0)
@@ -154,6 +174,45 @@ def intersect_point(d):#list of dict with SS_freq, SS_snr,SS_drift,id, time, ban
     query.print_json('all','a',s,e,p,MR,ssT)
     
     return p
+
+def intersect_point_lp(d):#list of dict with SS_freq, SS_snr,SS_drift,id, time, band, rx_sign, rx_lat, rx_lon, rx_loc, tx_sign, tx_lat, tx_lon, tx_loc, distance, azimuth, rx_azimuth, *frequency, power, *snr, *drift, version, code
+    st = time.process_time()    
+    a = {}    
+    #arranging by time
+    for i in d:
+        #adding new times
+        if a.get(i.get('time')) == None: 
+            a.update({i.get('time'): []})
+        a.get(i.get('time')).append(i)
+    
+    #O(N^2) but DP keeping track on inclusion and exlcusion
+    for i in a.keys():#time
+        mem = {}
+        print(a.get(i))
+        #prevent comparing with prev spot
+        for j in range(len(a.get(i))):#data
+            for k in range(j+1,len(a.get(i))):
+                #adding new stations
+                if mem.get(a.get(i)[j].get('id')) == None:
+                    mem.update({a.get(i)[j].get('id'): [0,0,0,0]})
+                if mem.get(a.get(i)[k].get('id')) == None:
+                    mem.update({a.get(i)[k].get('id'): [0,0,0,0]})
+                
+                #calculating points on intersection
+                p = intersect_greatcircle(A, B, C, D)
+                
+                #check if alr know ans
+    
+    print("intersect_point_lp,",time.process_time()-st)
+                
+    s = datetime.datetime(2024,9,1,0,0,0) #Y,M,D,h,m,s
+    e = datetime.datetime(2024,9,1,7,0,0)
+    MR = datetime.timedelta(minutes = 180)
+    ssT = 1
+    
+    #query.print_json('all','a',s,e,p,MR,ssT)
+    
+    #return p
                     
 
 if __name__ == "__main__":  
@@ -167,7 +226,7 @@ if __name__ == "__main__":
     #intersect_greatcircle([10,-70],[10,70],[10,-70],[10,-70])
     
     #A = [{'SS_freq': 1, 'SS_snr': 1, 'SS_drift': 1, 'id': '8100420947', 'time': '2024-07-24 09:26:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 1, 'power': 23, 'snr': 1, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'SS_freq': 1, 'SS_snr': 1, 'SS_drift': 1, 'id': '8100420947', 'time': '2024-07-24 09:26:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 2, 'power': 23, 'snr': -7, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'SS_freq': 1, 'SS_snr': 1, 'SS_drift': 1, 'id': '8100420947', 'time': '2024-07-24 09:28:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 1000000000000000000000000, 'power': 23, 'snr': 3, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'SS_freq': 1, 'SS_snr': 1, 'SS_drift': 1, 'id': '8100420947', 'time': '2024-07-24 09:30:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 4, 'power': 23, 'snr': -10, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1}]
-    A = process.anomalies('r', MR, ssT, s, e)
+    #A = process.anomalies('r', MR, ssT, s, e)
     
-    #print(intersect_point([{'SS_freq': 1, 'SS_snr': 1, 'SS_drift': 1, 'id': '8100420947', 'time': '2024-09-01 02:00:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': -80, 'rx_lon': -80, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 80, 'tx_lon': 80, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 1, 'power': 23, 'snr': 1, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'SS_freq': 1, 'SS_snr': 1, 'SS_drift': 1, 'id': '8100420947', 'time': '2024-09-01 02:00:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': -80, 'rx_lon': -75, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 80, 'tx_lon': 80, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 1, 'power': 23, 'snr': 1, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1}]))
-    intersect_point(A)
+    print(intersect_point_lp([{'SS_freq': 1, 'SS_snr': 1, 'SS_drift': 1, 'id': '8100420947', 'time': '2024-09-01 02:00:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': -80, 'rx_lon': -80, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 80, 'tx_lon': 80, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 1, 'power': 23, 'snr': 1, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'SS_freq': 1, 'SS_snr': 1, 'SS_drift': 1, 'id': '8100420947', 'time': '2024-09-01 02:00:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': -80, 'rx_lon': -75, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 80, 'tx_lon': 80, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 1, 'power': 23, 'snr': 1, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1}]))
+    #intersect_point_sp(A)

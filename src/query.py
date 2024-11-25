@@ -6,26 +6,26 @@ import datetime
 import process
 
 #   name             type
-#|id        |UInt64                |
-#|time      |DateTime              |
-#|band      |Int16                 |
-#|rx_sign   |LowCardinality(String)|
-#|rx_lat    |Float32               |
-#|rx_lon    |Float32               |
-#|rx_loc    |LowCardinality(String)|
-#|tx_sign   |LowCardinality(String)|
-#|tx_lat    |Float32               |
-#|tx_lon    |Float32               |
-#|tx_loc    |LowCardinality(String)|
-#|distance  |UInt16                |
-#|azimuth   |UInt16                |
-#|rx_azimuth|UInt16                |
-#|frequency |UInt32                |
-#|power     |Int8                  |
-#|snr       |Int8                  |
-#|drift     |Int8                  |
-#|version   |LowCardinality(String)|
-#|code      |Int8                  |
+#|id        |UInt64                |The unique spot id (same id as used by wsprnet.org)
+#|time      |DateTime              |The time the spot was received and reported
+#|band      |Int16                 |The band the transmission took place on (First digit of Frequency not the band in meter!) (-1: LF, 0: MF, 1: 160m, … see band table below for translations)
+#|rx_sign   |LowCardinality(String)|The receiver callsign
+#|rx_lat    |Float32               |The receiver latitude in degrees (derived from rx_loc)
+#|rx_lon    |Float32               |The receiver longitude in degrees (derived from rx_loc)
+#|rx_loc    |LowCardinality(String)|The receiver locator
+#|tx_sign   |LowCardinality(String)|The sender callsign
+#|tx_lat    |Float32               |The sender latitude in degrees (derived from tx_loc)
+#|tx_lon    |Float32               |The sender longitude in degrees (derived from tx_loc)
+#|tx_loc    |LowCardinality(String)|The sender locator
+#|distance  |UInt16                |The distance in km
+#|azimuth   |UInt16                |The sender azimuth (as on wsprnet.org angle of receiver as seen from the transmitter 0 to 359)
+#|rx_azimuth|UInt16                |The receiver azimuth (angle of incoming short path as seen from the receiver 0 to 359)
+#|frequency |UInt32                |The receive frequency in Hz
+#|power     |Int8                  |The reported transmit power in dBm (might be wrong when used for other stats)
+#|snr       |Int8                  |The reported snr in dB
+#|drift     |Int8                  |The reported frequency drift (-3 to 3 unknown unit, might be Hz)
+#|version   |LowCardinality(String)|The receiver software version string as reported (see wsprnet.org forum for details on this)
+#|code      |Int8                  |The code/mode flag see Wspr / FSt4W mode mappings below to find out what this values mean
 
 #query data from wspr.net
 def wsprlive_get(col, database, ts, te, rx = None, tx = None, l=None): #colums, database, start dateTime, end dateTime, rx_sign = None, tx_sign = None limit = None
@@ -116,8 +116,8 @@ def wspr_to_json(t, ts, te, rx = None, tx = None):
 
 if __name__ == "__main__":
     #print(wsprlive_get("*", "rx", '2024-09-01 00:00:00', '2024-09-01 07:00:00'))
-    s = datetime.datetime(2024,10,1,0,0,0) #Y,M,D,h,m,s
-    e = datetime.datetime(2024,10,1,10,0,0)
+    s = datetime.datetime(2024,9,1,0,0,0) #Y,M,D,h,m,s
+    e = datetime.datetime(2024,9,1,7,0,0)
     
     #process.print_csv('all_UTC',s,e,MR,wsprlive_get("*", "rx", str(s), str(e)))
     
