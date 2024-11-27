@@ -10,6 +10,11 @@ c = 299792458#m/s
 k = 1.38*10**-23#j/k
 t0 = 290#k
 B = 6
+R = 6378000#m radius of earth
+Hiono = 300000#m
+pheight = 20
+plength = 70
+pheading = 0
 
 
 crx = [-149.958, 61.146] #lon, lat
@@ -95,10 +100,10 @@ def intersect_greatcircle(A, B, C, D):#lat,lon
     return[i_lat1, i_long1, i_lat2, i_long2]
 
 def lg(v):
-        return math.log(v,10)
+    return math.log(v,10)
     
-def RCS(h,l,a,f):
-    return 4 * math.pi * h**2 * l**2 * math.cos(a)**2 * f**2 / c**2
+def RCS(h,l,ra,f):
+    return 4 * math.pi * h**2 * l**2 * math.sin(ra)**2 * f**2 / c**2
 
 def Dgc(r,lat1,lon1,lat2,lon2):
     return r * math.acos(math.sin(lat1) * math.sin(lat2) + math.cos(lat1) * math.cos(lat2) * math.cos(lon1- lon2))
@@ -106,9 +111,17 @@ def Dgc(r,lat1,lon1,lat2,lon2):
 def Dhtotal(Dgctotal,n,h):
     return math.sqrt(Dgctotal + n**2 * h**2)
 
-def SNR(p,f,rcs,rtx,rrx,n):#power transmitted(dB), frequency transmitted, RCS of target, distance from tx to target, distance from rx to target, number of hops
+def SNR(p,f,rcs,rrx,rtx,n):#power transmitted(dB), frequency transmitted, RCS of target, distance from tx to target, distance from rx to target, number of hops
     return p + 40 * lg(c) - 40 * lg(f) + 10 * lg (rcs) - 50 * lg(4*math.pi) - 40 * lg(rtx)  - 40 * lg(rtx) - 10 * lg(k * t0 * B) - 5 * n
         
+def Hr(a,latp,lonp,lats,lons):#heading of plane relative to north
+    #relative heading
+    A = lats
+    B = latp
+    C = math.sin(latp) * math.sin(lats) + math.cos(latp) * math.cos(lats) * math.cos(lons - lonp)
+    s = math.acos((math.cos(A) - math.cos(B) * C) / (math.sin(B) * math.sin(math.acos(C))))
+    return a - s
+
 def first_node(a):#find higher node in a spot
     if a.get('rx_lat') > a.get('tx_lat'):
         return a.get('rx_lat')
@@ -185,23 +198,25 @@ def intersect_point_lp(d):#list of dict with SS_freq, SS_snr,SS_drift,id, time, 
             a.update({i.get('time'): []})
         a.get(i.get('time')).append(i)
     
-    #O(N^2) but DP keeping track on inclusion and exlcusion
+    #O(N^2) but DP
+    mem = {}
+    p = []
     for i in a.keys():#time
-        mem = {}
-        print(a.get(i))
         #prevent comparing with prev spot
         for j in range(len(a.get(i))):#data
             for k in range(j+1,len(a.get(i))):
-                #adding new stations
-                if mem.get(a.get(i)[j].get('id')) == None:
-                    mem.update({a.get(i)[j].get('id'): [0,0,0,0]})
-                if mem.get(a.get(i)[k].get('id')) == None:
-                    mem.update({a.get(i)[k].get('id'): [0,0,0,0]})
-                
-                #calculating points on intersection
-                p = intersect_greatcircle(A, B, C, D)
-                
                 #check if alr know ans
+                if mem.get([min(j.get('rx_lat'),j.get('rx_lon')),max(j.get('rx_lat'),j.get('rx_lon'))]).get([min(k.get('rx_lat'),k.get('rx_lon')),max(k.get('rx_lat'),k.get('rx_lon'))]) == None:
+                    #calculating points on intersection
+                    point = intersect_greatcircle([j.get('rx_lat'),j.get('rx_lon')], [j.get('tx_lat'),j.get('tx_lon')], [k.get('rx_lat'),k.get('rx_lon')], [k.get('tx_lat'),k.get('tx_lon')])
+                    #point 1 with spot 1
+                    rcs = RCS(pheight,plength,math.pi/2,j.get('frequency'))
+                    Dgctotal1 = Dgc(R,j.get('rx_lat'),j.get('rx_lon'),j.get('tx_lat'),j.get('tx_lon'))
+                    N1 = math.ceil(Dgctotal1/(2*R*math.acos(R/(R+300000))))
+                    Rrx1 = (Dgc(R,point[0],point[1],j.get('rx_lat'),j.get('rx_lon'))/Dgctotal1)*Dhtotal(Dgctotal1, N1, Hiono)
+                    Rtx1 = (Dgc(R,point[0],point[1],j.get('tx_lat'),j.get('tx_lon'))/Dgctotal1)*Dhtotal(Dgctotal1, N1, Hiono)
+                    SNR11 = SNR(j.get('power'),j.get('frequency'),rcs,Rrx1,Rtx1,N1)
+                
     
     print("intersect_point_lp,",time.process_time()-st)
                 
