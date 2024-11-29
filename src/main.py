@@ -15,7 +15,7 @@ ssT = 0.5
 pf = 'r'#r(read from json), t(test case), q(query from wsprnet)
 
 #plot details
-mf = 'i'#type: a(all anomalies, takes in data from anomalies) i (intersecting lines and corresponding points, takes data from intersect_point) p(only points of intersection,  takes data from intersect_point) r(all spots)
+mf = 'i'#a(all anomalies, takes in data from anomalies) i (intersecting lines and corresponding points, takes data from intersect_point) p(only points of intersection,  takes data from intersect_point) r(all spots)
 lat1 = -90#map lowest lat
 lon1 = -180#map lowest lon
 lat2 = 90#map highest lat
@@ -23,9 +23,10 @@ lon2 = 180#map highest lon
 c = "2024-09-01 03:00:00"#timestamp of plot
 
 a = process.anomalies(pf,MR,ssT,s,e)
-p = check.intersect_point_sp(a)
+p = check.intersect_point_lp(a)
 
 # plot for multiple time stamps
+
 for m in range(0,60,2):
     if(m < 10):
         c = '2024-09-01 03:0'+str(m)+':00'

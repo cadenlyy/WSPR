@@ -76,9 +76,12 @@ def fdrawgreatcircle(maplength,p1_lon, p1_lat,p2_lon,p2_lat, m, linewidth = 1, c
                 lat1 -= 1
         m.drawgreatcircle(lon1, lat1, lon2, lat2, linewidth = linewidth, c = c, zorder = zorder)
             
-#plot greatcircle for all data points
-
-
+def fulldrawgreatcircle(maplength,p1_lon, p1_lat, p2_lon, p2_lat, m, linewidth = 1, c = 'red', zorder = 1):
+    fdrawgreatcircle(maplength ,p1_lon, p1_lat, p2_lon, p2_lat, m, linewidth = linewidth, c = c,zorder = zorder)
+    fdrawgreatcircle(maplength, p1_lon/abs(p1_lon)*-180+p1_lon, -p1_lat, p2_lon, p2_lat, m, linewidth = linewidth, c = c,zorder = zorder)
+    fdrawgreatcircle(maplength, p1_lon, p1_lat, p2_lon/abs(p2_lon)*-180+p2_lon, -p2_lat, m, linewidth = linewidth, c = c,zorder = zorder)
+    fdrawgreatcircle(maplength, p1_lon/abs(p1_lon)*-180+p1_lon, -p1_lat, p2_lon/abs(p2_lon)*-180+p2_lon, -p2_lat, m, linewidth = linewidth, c = c,zorder = zorder)
+    
 def p(t,f,c,MR,ssT,lat1,lon1,lat2,lon2):#draw map and all plots
     #plot naming convention
     #type_currenttime_MR,ssT,lat1,lon1,lat2,lon2
@@ -119,13 +122,13 @@ def p(t,f,c,MR,ssT,lat1,lon1,lat2,lon2):#draw map and all plots
                 p1_long1 = i[2].get('rx_lon')
                 p1_lat2 = i[2].get('tx_lat')
                 p1_long2 = i[2].get('tx_lon')
-                fdrawgreatcircle([lon1, lon2], p1_long1, p1_lat1, p1_long2, p1_lat2, m, linewidth= 10, c='blue',zorder=1)
+                fulldrawgreatcircle([lon1, lon2], p1_long1, p1_lat1, p1_long2, p1_lat2, m, linewidth= 10, c='blue',zorder=1)
                 
                 p2_lat1 = i[3].get('rx_lat')
                 p2_long1 = i[3].get('rx_lon')
                 p2_lat2 = i[3].get('tx_lat')
                 p2_long2 = i[3].get('tx_lon')
-                fdrawgreatcircle([lon1, lon2], p2_long1, p2_lat1, p2_long2, p2_lat2, m, linewidth= 10, c='blue',zorder=1)
+                fulldrawgreatcircle([lon1, lon2], p2_long1, p2_lat1, p2_long2, p2_lat2, m, linewidth= 10, c='blue',zorder=1)
             
                 plt.plot([i[1]], [i[0]], marker=".", markersize=50, c = 'red',zorder=3)
                 plt.plot([i[2].get('rx_lon'),i[2].get('tx_lon'),i[3].get('rx_lon'),i[3].get('tx_lon')],[i[2].get('rx_lat'),i[2].get('tx_lat'),i[3].get('rx_lat'),i[3].get('tx_lat')], linestyle='None', marker=".", markersize=50, c = 'green',zorder=2)
@@ -154,7 +157,18 @@ if __name__ == "__main__":
     
     #p('p&l',s,e,query.read_json('all_points', ts, te, MR))
     #p('p&l',s,e,check.intersect_point(process.anomalies('r', MR, ts, te)))
-    p(process.anomalies('r',MR,ssT,ts,te), 'a',"2024-09-01 03:00:00", MR, ssT, -90, -60, -30, 60)
+    #p(process.anomalies('r',MR,ssT,ts,te), 'a',"2024-09-01 03:00:00", MR, ssT, -90, -60, -30, 60)
     #p('p&l',s,e,[[-35.83848798770491, 55.91852851448542, {'SS_freq': -348619.2288304247, 'SS_snr': 29.677178697402976, 'SS_drift': 0, 'id': '8256616381', 'time': '2024-09-01 03:52:00', 'band': 18, 'rx_sign': 'VK5TC', 'rx_lat': -35.062, 'rx_lon': 138.542, 'rx_loc': 'PF94gw', 'tx_sign': 'VK4BA', 'tx_lat': -27.521, 'tx_lon': 152.958, 'tx_loc': 'QG62', 'distance': 1604, 'azimuth': 235, 'rx_azimuth': 62, 'frequency': 18106186, 'power': 23, 'snr': -23, 'drift': 0, 'version': '2.6.1', 'code': 1}, {'SS_freq': -5993775.392985822, 'SS_snr': 46.565621163477765, 'SS_drift': 19527068.560821768, 'id': '8256619589', 'time': '2024-09-01 03:52:00', 'band': 21, 'rx_sign': 'KFS/SW', 'rx_lat': 37.396, 'rx_lon': -122.375, 'rx_loc': 'CM87tj', 'tx_sign': 'ZL3TKI', 'tx_lat': -43.562, 'tx_lon': 172.625, 'tx_loc': 'RE66hk', 'distance': 11130, 'azimuth': 47, 'rx_azimuth': 221, 'frequency': 21096101, 'power': 23, 'snr': -3, 'drift': 0, 'version': 'WD_3.2.2', 'code': 1}]])
+    plt.figure(figsize=(100,60))
+    m = Basemap(projection='cyl',llcrnrlat=-90,urcrnrlat=90,
+                llcrnrlon=-180,urcrnrlon=180,resolution='c')
     
+    m.drawcoastlines(linewidth=5)
+    #map.drawmapboundary()
+    
+    m.drawmeridians(np.arange(0,360,30))
+    m.drawparallels(np.arange(-90,90,30))
+    
+    fulldrawgreatcircle([-180,180], 90, 1, 2, 65, m, linewidth=5)
+
 

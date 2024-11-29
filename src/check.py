@@ -15,6 +15,7 @@ Hiono = 300000#m
 pheight = 20
 plength = 70
 pheading = 0
+SPN = 4.9406564584124654e-324
 
 
 crx = [-149.958, 61.146] #lon, lat
@@ -106,13 +107,19 @@ def RCS(h,l,ra,f):
     return 4 * math.pi * h**2 * l**2 * math.sin(ra)**2 * f**2 / c**2
 
 def Dgc(r,lat1,lon1,lat2,lon2):
-    return r * math.acos(math.sin(lat1) * math.sin(lat2) + math.cos(lat1) * math.cos(lat2) * math.cos(lon1- lon2))
+    if r * math.acos(math.sin(lat1*math.pi/180) * math.sin(lat2*math.pi/180) + math.cos(lat1*math.pi/180) * math.cos(lat2*math.pi/180) * math.cos(lon2*math.pi/180- lon1*math.pi/180)) != 0:
+        return r * math.acos(math.sin(lat1*math.pi/180) * math.sin(lat2*math.pi/180) + math.cos(lat1*math.pi/180) * math.cos(lat2*math.pi/180) * math.cos(lon2*math.pi/180- lon1*math.pi/180))
+    return 1e-316#smallest float u can return in sypder
 
 def Dhtotal(Dgctotal,n,h):
-    return math.sqrt(Dgctotal + n**2 * h**2)
+    return math.sqrt(Dgctotal**2 + (2*n)**2 * h**2)
 
 def SNR(p,f,rcs,rrx,rtx,n):#power transmitted(dB), frequency transmitted, RCS of target, distance from tx to target, distance from rx to target, number of hops
-    return p + 40 * lg(c) - 40 * lg(f) + 10 * lg (rcs) - 50 * lg(4*math.pi) - 40 * lg(rtx)  - 40 * lg(rtx) - 10 * lg(k * t0 * B) - 5 * n
+    noise = 10 * lg(k * t0 * B)
+    signal = p - 30 + 20 * lg(c) - 20 * lg(f) + 10 * lg(rcs) - 30 * lg(4*math.pi) - 20 * lg(rrx) - 20 * lg(rtx)
+    #print(signal, noise, losses)
+    return signal - noise 
+
         
 def Hr(a,latp,lonp,lats,lons):#heading of plane relative to north
     #relative heading
@@ -167,11 +174,11 @@ def intersect_point_sp(d):#list of dict with SS_freq, SS_snr,SS_drift,id, time, 
                         #check for intersections
                         point = intersect_greatcircle([j.get('rx_lat'),j.get('rx_lon')], [j.get('tx_lat'),j.get('tx_lon')], [k.get('rx_lat'),k.get('rx_lon')], [k.get('tx_lat'),k.get('tx_lon')])
                         if (j.get('rx_lon') != k.get('rx_lon') or j.get('rx_lat') != k.get('rx_lat')) and (j.get('tx_lon') != k.get('tx_lon') or j.get('tx_lat') != k.get('tx_lat')) and (j.get('rx_lon') != k.get('tx_lon') or j.get('rx_lat') != k.get('tx_lat')) and (j.get('tx_lon') != k.get('rx_lon') or j.get('tx_lat') != k.get('rx_lat')):
-                            if shortest_hdist(j.get('rx_lon'), j.get('tx_lon'), [-180, 180]) > abs(point[1]-j.get('rx_lon')) and shortest_hdist(j.get('rx_lon'), j.get('tx_lon'), [-180, 180]) > abs(point[1]-j.get('tx_lon')) and abs(k.get('rx_lon')-k.get('tx_lon')) > abs(point[1]-k.get('rx_lon')) and abs(k.get('rx_lon')-k.get('tx_lon')) > abs(point[1]-k.get('tx_lon')) and shortest_hdist(k.get('rx_lon'), k.get('tx_lon'), [-180, 180]) > abs(point[1]-k.get('rx_lon')) and shortest_hdist(k.get('rx_lon'), k.get('tx_lon'), [-180, 180]) > abs(point[1]-k.get('tx_lon')) and abs(k.get('rx_lon')-k.get('tx_lon')) > abs(point[1]-k.get('rx_lon')) and abs(k.get('rx_lon')-k.get('tx_lon')) > abs(point[1]-k.get('tx_lon')):
+                            if shortest_hdist(j.get('rx_lon'), j.get('tx_lon'), [-180, 180]) > abs(point[1]-j.get('rx_lon')) and shortest_hdist(j.get('rx_lon'), j.get('tx_lon'), [-180, 180]) > abs(point[1]-j.get('tx_lon')) and shortest_hdist(k.get('rx_lon'), k.get('tx_lon'), [-180, 180]) > abs(point[1]-k.get('rx_lon')) and shortest_hdist(k.get('rx_lon'), k.get('tx_lon'), [-180, 180]) > abs(point[1]-k.get('tx_lon')):
                                 #adding point
                                 p.append([point[0],point[1],j,k])
                                 
-                            if shortest_hdist(j.get('rx_lon'), j.get('tx_lon'), [-180, 180]) > abs(point[3]-j.get('rx_lon')) and shortest_hdist(j.get('rx_lon'), j.get('tx_lon'), [-180, 180]) > abs(point[3]-j.get('tx_lon')) and abs(k.get('rx_lon')-k.get('tx_lon')) > abs(point[3]-k.get('rx_lon')) and abs(k.get('rx_lon')-k.get('tx_lon')) > abs(point[3]-k.get('tx_lon')) and shortest_hdist(k.get('rx_lon'), k.get('tx_lon'), [-180, 180]) > abs(point[3]-k.get('rx_lon')) and shortest_hdist(k.get('rx_lon'), k.get('tx_lon'), [-180, 180]) > abs(point[3]-k.get('tx_lon')) and abs(k.get('rx_lon')-k.get('tx_lon')) > abs(point[3]-k.get('rx_lon')) and abs(k.get('rx_lon')-k.get('tx_lon')) > abs(point[3]-k.get('tx_lon')):
+                            if shortest_hdist(j.get('rx_lon'), j.get('tx_lon'), [-180, 180]) > abs(point[3]-j.get('rx_lon')) and shortest_hdist(j.get('rx_lon'), j.get('tx_lon'), [-180, 180]) > abs(point[3]-j.get('tx_lon')) and shortest_hdist(k.get('rx_lon'), k.get('tx_lon'), [-180, 180]) > abs(point[3]-k.get('rx_lon')) and shortest_hdist(k.get('rx_lon'), k.get('tx_lon'), [-180, 180]) > abs(point[3]-k.get('tx_lon')):
                                 #adding point
                                 p.append([point[2],point[3],j,k])
                 #adding new openspot              
@@ -199,24 +206,112 @@ def intersect_point_lp(d):#list of dict with SS_freq, SS_snr,SS_drift,id, time, 
         a.get(i.get('time')).append(i)
     
     #O(N^2) but DP
-    mem = {}
+    '''mem = {}'''
     p = []
     for i in a.keys():#time
         #prevent comparing with prev spot
         for j in range(len(a.get(i))):#data
             for k in range(j+1,len(a.get(i))):
+                '''
                 #check if alr know ans
-                if mem.get([min(j.get('rx_lat'),j.get('rx_lon')),max(j.get('rx_lat'),j.get('rx_lon'))]).get([min(k.get('rx_lat'),k.get('rx_lon')),max(k.get('rx_lat'),k.get('rx_lon'))]) == None:
+                if mem.get(j).get(k) == None:
+                    '''
+                s1 = a.get(i)[j]
+                s2 = a.get(i)[k]
+                #check that tx and rx are not repeated
+                if (s1.get('rx_lon') != s2.get('rx_lon') or s1.get('rx_lat') != s2.get('rx_lat')) and (s1.get('tx_lon') != s2.get('tx_lon') or s1.get('tx_lat') != s2.get('tx_lat')) and (s1.get('rx_lon') != s2.get('tx_lon') or s1.get('rx_lat') != s2.get('tx_lat')) and (s1.get('tx_lon') != s2.get('rx_lon') or s1.get('tx_lat') != s2.get('rx_lat')):
                     #calculating points on intersection
-                    point = intersect_greatcircle([j.get('rx_lat'),j.get('rx_lon')], [j.get('tx_lat'),j.get('tx_lon')], [k.get('rx_lat'),k.get('rx_lon')], [k.get('tx_lat'),k.get('tx_lon')])
+                    point = intersect_greatcircle([s1.get('rx_lat'),s1.get('rx_lon')], [s1.get('tx_lat'),s1.get('tx_lon')], [s2.get('rx_lat'),s2.get('rx_lon')], [s2.get('tx_lat'),s2.get('tx_lon')])
+                    
+                    rcs1 = RCS(pheight,plength,math.pi/2,s1.get('frequency'))
+                    rcs2 = RCS(pheight,plength,math.pi/2,s2.get('frequency'))
                     #point 1 with spot 1
-                    rcs = RCS(pheight,plength,math.pi/2,j.get('frequency'))
-                    Dgctotal1 = Dgc(R,j.get('rx_lat'),j.get('rx_lon'),j.get('tx_lat'),j.get('tx_lon'))
-                    N1 = math.ceil(Dgctotal1/(2*R*math.acos(R/(R+300000))))
-                    Rrx1 = (Dgc(R,point[0],point[1],j.get('rx_lat'),j.get('rx_lon'))/Dgctotal1)*Dhtotal(Dgctotal1, N1, Hiono)
-                    Rtx1 = (Dgc(R,point[0],point[1],j.get('tx_lat'),j.get('tx_lon'))/Dgctotal1)*Dhtotal(Dgctotal1, N1, Hiono)
-                    SNR11 = SNR(j.get('power'),j.get('frequency'),rcs,Rrx1,Rtx1,N1)
-                
+                    #checking if it point on long path or short path
+                    if shortest_hdist(s1.get('rx_lon'), s1.get('tx_lon'), [-180, 180]) > abs(point[1]-s1.get('rx_lon')) and shortest_hdist(s1.get('rx_lon'), s1.get('tx_lon'), [-180, 180]) > abs(point[1]-s1.get('tx_lon')):
+                        Dgctotal11 = Dgc(R,s1.get('rx_lat'),s1.get('rx_lon'),s1.get('tx_lat'),s1.get('tx_lon'))
+                    else:
+                        Dgctotal11 = 2 * math.pi * R - Dgc(R,s1.get('rx_lat'),s1.get('rx_lon'),s1.get('tx_lat'),s1.get('tx_lon'))
+                    N11 = math.ceil(Dgctotal11/(2*R*math.acos(R/(R+300000))))
+                    #ensuring distance from rx to target is the correct 1
+                    if shortest_hdist(point[1], s1.get('tx_lon'), [-180, 180]) > abs(s1.get('rx_lon')-s1.get('tx_lon')) and shortest_hdist(point[1], s1.get('tx_lon'), [-180, 180]) > abs(s1.get('rx_lon')-point[1]):
+                        Rrx11 = (Dgc(R,point[0],point[1],s1.get('rx_lat'),s1.get('rx_lon'))/Dgctotal11)*Dhtotal(Dgctotal11, N11, Hiono)
+                    else:
+                        Rrx11 = ((2 * math.pi * R - Dgc(R,point[0],point[1],s1.get('rx_lat'),s1.get('rx_lon')))/Dgctotal11)*Dhtotal(Dgctotal11, N11, Hiono)
+                    if shortest_hdist(point[1], s1.get('rx_lon'), [-180, 180]) > abs(s1.get('tx_lon')-s1.get('rx_lon')) and shortest_hdist(point[1], s1.get('rx_lon'), [-180, 180]) > abs(s1.get('tx_lon')-point[1]):
+                        Rtx11 = (Dgc(R,point[0],point[1],s1.get('tx_lat'),s1.get('tx_lon'))/Dgctotal11)*Dhtotal(Dgctotal11, N11, Hiono)
+                    else:
+                        Rtx11 = ((2 * math.pi * R - Dgc(R,point[0],point[1],s1.get('tx_lat'),s1.get('tx_lon')))/Dgctotal11)*Dhtotal(Dgctotal11, N11, Hiono)
+                    SNR11 = SNR(s1.get('power'),s1.get('frequency'),rcs1,Rrx11,Rtx11,N11)
+                    #print('11',SNR11)
+                    if SNR11 > -30:
+                        
+                        #point 1 with spot 2
+                        if shortest_hdist(s2.get('rx_lon'), s2.get('tx_lon'), [-180, 180]) > abs(point[1]-s2.get('rx_lon')) and shortest_hdist(s2.get('rx_lon'), s2.get('tx_lon'), [-180, 180]) > abs(point[1]-s2.get('tx_lon')):
+                            Dgctotal12 = Dgc(R,s2.get('rx_lat'),s2.get('rx_lon'),s2.get('tx_lat'),s2.get('tx_lon'))
+                        else:
+                            Dgctotal12 = 2 * math.pi * R - Dgc(R,s2.get('rx_lat'),s2.get('rx_lon'),s2.get('tx_lat'),s2.get('tx_lon'))
+                        N12 = math.ceil(Dgctotal12/(2*R*math.acos(R/(R+300000))))
+                        #ensuring distance from rx to target is the correct 1
+                        if shortest_hdist(point[1], s2.get('tx_lon'), [-180, 180]) > abs(s2.get('rx_lon')-s2.get('tx_lon')) and shortest_hdist(point[1], s2.get('tx_lon'), [-180, 180]) > abs(s2.get('rx_lon')-point[1]):
+                            Rrx12 = (Dgc(R,point[0],point[1],s2.get('rx_lat'),s2.get('rx_lon'))/Dgctotal12)*Dhtotal(Dgctotal12, N12, Hiono)
+                        else:
+                            Rrx12 = ((2 * math.pi * R - Dgc(R,point[0],point[1],s2.get('rx_lat'),s2.get('rx_lon')))/Dgctotal12)*Dhtotal(Dgctotal12, N12, Hiono)
+                        if shortest_hdist(point[1], s2.get('rx_lon'), [-180, 180]) > abs(s2.get('tx_lon')-s2.get('rx_lon')) and shortest_hdist(point[1], s2.get('rx_lon'), [-180, 180]) > abs(s2.get('tx_lon')-point[1]):
+                            Rtx12 = (Dgc(R,point[0],point[1],s2.get('tx_lat'),s2.get('tx_lon'))/Dgctotal12)*Dhtotal(Dgctotal12, N12, Hiono)
+                        else:
+                            Rtx12 = ((2 * math.pi * R - Dgc(R,point[0],point[1],s2.get('tx_lat'),s2.get('tx_lon')))/Dgctotal12)*Dhtotal(Dgctotal12, N12, Hiono)
+                        SNR12 = SNR(s2.get('power'),s2.get('frequency'),rcs2,Rrx12,Rtx12,N12)
+                        #print('12',SNR12)
+                        if SNR12 > -30:
+                            p.append([point[0],point[1],s1,s2])
+                            
+                    #point 2 with spot 1
+                    #checking if it point on long path or short path
+                    if shortest_hdist(s1.get('rx_lon'), s1.get('tx_lon'), [-180, 180]) > abs(point[3]-s1.get('rx_lon')) and shortest_hdist(s1.get('rx_lon'), s1.get('tx_lon'), [-180, 180]) > abs(point[3]-s1.get('tx_lon')):
+                        Dgctotal21 = Dgc(R,s1.get('rx_lat'),s1.get('rx_lon'),s1.get('tx_lat'),s1.get('tx_lon'))
+                    else:
+                        Dgctotal21 = 2 * math.pi * R - Dgc(R,s1.get('rx_lat'),s1.get('rx_lon'),s1.get('tx_lat'),s1.get('tx_lon'))
+                    N21 = math.ceil(Dgctotal21/(2*R*math.acos(R/(R+300000))))
+                    #ensuring distance from rx to target is the correct 1
+                    if shortest_hdist(point[3], s1.get('tx_lon'), [-180, 180]) > abs(s1.get('rx_lon')-s1.get('tx_lon')) and shortest_hdist(point[3], s1.get('tx_lon'), [-180, 180]) > abs(s1.get('rx_lon')-point[3]):
+                        Rrx21 = (Dgc(R,point[2],point[3],s1.get('rx_lat'),s1.get('rx_lon'))/Dgctotal21)*Dhtotal(Dgctotal21, N21, Hiono)
+                    else:
+                        Rrx21 = ((2 * math.pi * R - Dgc(R,point[2],point[3],s1.get('rx_lat'),s1.get('rx_lon')))/Dgctotal21)*Dhtotal(Dgctotal21, N21, Hiono)
+                    if shortest_hdist(point[3], s1.get('rx_lon'), [-180, 180]) > abs(s1.get('tx_lon')-s1.get('rx_lon')) and shortest_hdist(point[3], s1.get('rx_lon'), [-180, 180]) > abs(s1.get('tx_lon')-point[3]):
+                        Rtx21 = (Dgc(R,point[2],point[3],s1.get('tx_lat'),s1.get('tx_lon'))/Dgctotal21)*Dhtotal(Dgctotal21, N21, Hiono)
+                    else:
+                        Rtx21 = ((2 * math.pi * R - Dgc(R,point[2],point[3],s1.get('tx_lat'),s1.get('tx_lon')))/Dgctotal21)*Dhtotal(Dgctotal21, N21, Hiono)
+                    SNR21 = SNR(s1.get('power'),s1.get('frequency'),rcs1,Rrx21,Rtx21,N21)
+                    #print('21',SNR21)
+                    if SNR21 > -30:
+                        #point 1 with spot 2
+                        if shortest_hdist(s2.get('rx_lon'), s2.get('tx_lon'), [-180, 180]) > abs(point[3]-s2.get('rx_lon')) and shortest_hdist(s2.get('rx_lon'), s2.get('tx_lon'), [-180, 180]) > abs(point[3]-s2.get('tx_lon')):
+                            Dgctotal22 = Dgc(R,s2.get('rx_lat'),s2.get('rx_lon'),s2.get('tx_lat'),s2.get('tx_lon'))
+                        else:
+                            Dgctotal22 = 2 * math.pi * R - Dgc(R,s2.get('rx_lat'),s2.get('rx_lon'),s2.get('tx_lat'),s2.get('tx_lon'))
+                        N22 = math.ceil(Dgctotal22/(2*R*math.acos(R/(R+300000))))
+                        #ensuring distance from rx to target is the correct 1
+                        if shortest_hdist(point[3], s2.get('tx_lon'), [-180, 180]) > abs(s2.get('rx_lon')-s2.get('tx_lon')) and shortest_hdist(point[3], s2.get('tx_lon'), [-180, 180]) > abs(s2.get('rx_lon')-point[3]):
+                            Rrx22 = (Dgc(R,point[2],point[3],s2.get('rx_lat'),s2.get('rx_lon'))/Dgctotal22)*Dhtotal(Dgctotal22, N22, Hiono)
+                        else:
+                            Rrx22 = ((2 * math.pi * R - Dgc(R,point[2],point[3],s2.get('rx_lat'),s2.get('rx_lon')))/Dgctotal22)*Dhtotal(Dgctotal22, N22, Hiono)
+                        if shortest_hdist(point[3], s2.get('rx_lon'), [-180, 180]) > abs(s2.get('tx_lon')-s2.get('rx_lon')) and shortest_hdist(point[3], s2.get('rx_lon'), [-180, 180]) > abs(s2.get('tx_lon')-point[3]):
+                            Rtx22 = (Dgc(R,point[2],point[3],s2.get('tx_lat'),s2.get('tx_lon'))/Dgctotal22)*Dhtotal(Dgctotal22, N22, Hiono)
+                        else:
+                            Rtx22 = ((2 * math.pi * R - Dgc(R,point[2],point[3],s2.get('tx_lat'),s2.get('tx_lon')))/Dgctotal22)*Dhtotal(Dgctotal22, N22, Hiono)
+                        SNR22 = SNR(s2.get('power'),s2.get('frequency'),rcs2,Rrx22,Rtx22,N22)
+                        #print('22',SNR22)
+                        if SNR22 > -30:
+                            p.append([point[2],point[3],s1,s2])
+                        '''
+                        mem.get(j).get(k).update([SNR11,SNR12,SNR21,SNR22])
+                else:
+                    if mem.get(j).get(k)[0] > 30 and mem.get(j).get(k)[1] > 30:
+                        p.append([point[0],point[1],j,k])
+                    if mem.get(j)(k)[2] > 30 and mem.get(j)(k)[3] > 30:
+                        p.append([point[2],point[3],j,k])
+                        '''
+                    
     
     print("intersect_point_lp,",time.process_time()-st)
                 
@@ -225,9 +320,9 @@ def intersect_point_lp(d):#list of dict with SS_freq, SS_snr,SS_drift,id, time, 
     MR = datetime.timedelta(minutes = 180)
     ssT = 1
     
-    #query.print_json('all','a',s,e,p,MR,ssT)
+    query.print_json('all','a',s,e,p,MR,ssT)
     
-    #return p
+    return p
                     
 
 if __name__ == "__main__":  
