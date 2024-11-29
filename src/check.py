@@ -311,8 +311,7 @@ def intersect_point_lp(d):#list of dict with SS_freq, SS_snr,SS_drift,id, time, 
                     if mem.get(j)(k)[2] > 30 and mem.get(j)(k)[3] > 30:
                         p.append([point[2],point[3],j,k])
                         '''
-                    
-    
+
     print("intersect_point_lp,",time.process_time()-st)
                 
     s = datetime.datetime(2024,9,1,0,0,0) #Y,M,D,h,m,s

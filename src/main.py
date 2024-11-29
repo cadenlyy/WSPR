@@ -22,7 +22,7 @@ lat2 = 90#map highest lat
 lon2 = 180#map highest lon
 c = "2024-09-01 03:00:00"#timestamp of plot
 
-a = process.anomalies(pf,MR,ssT,s,e)
+a = process.anomalies_freqsnr(pf,MR,ssT,s,e)
 p = check.intersect_point_lp(a)
 
 # plot for multiple time stamps
