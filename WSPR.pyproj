@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>1db0b598-ecb1-4567-ae36-79a3a15d32fb</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>src\proccess.py</StartupFile>
+    <StartupFile>src\main.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -21,12 +21,33 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="src\.ipynb_checkpoints\proccess-checkpoint.py" />
+    <Compile Include="src\.ipynb_checkpoints\query-checkpoint.py" />
+    <Compile Include="src\check.py" />
+    <Compile Include="src\main.py" />
+    <Compile Include="src\plot_planes.py" />
+    <Compile Include="src\process.py" />
     <Compile Include="src\test.py" />
-    <Compile Include="src\proccess.py" />
     <Compile Include="src\query.py" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include=".ipynb_checkpoints\" />
+    <Folder Include="data\" />
+    <Folder Include="data\csv\" />
+    <Folder Include="data\json\" />
+    <Folder Include="data\plot\" />
     <Folder Include="src\" />
+    <Folder Include="src\.ipynb_checkpoints\" />
+    <Folder Include="src\__pycache__\" />
+    <Folder Include="__pycache__\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include=".ipynb_checkpoints\WSPR-checkpoint.pyproj" />
+    <Content Include="src\__pycache__\plot_planes.cpython-39.pyc" />
+    <Content Include="src\__pycache__\process.cpython-39.pyc" />
+    <Content Include="src\__pycache__\query.cpython-312.pyc" />
+    <Content Include="src\__pycache__\query.cpython-39.pyc" />
+    <Content Include="__pycache__\query.cpython-38.pyc" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

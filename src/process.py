@@ -39,7 +39,7 @@ def print_csv(tstations, tdata, ts, te, MR, ssT, data, rx = None, tx = None):#ou
     else:
         tx = '_'+tx
     #file path and nameing
-    base_dir = "C:/Users/Lyiyang1/Desktop/wspr/data/csv"
+    base_dir = "C:\\Users\\caden\\Documents\\code\\Real\\WSPR\\data\\csv"
     filename = tstations+'_'+tdata+rx+tx+'_'+ts.strftime("%Y-%m-%d_%H-%M-%S")+'_'+te.strftime("%Y-%m-%d_%H-%M-%S")+'_'+str(MR).split(':')[0]+'-'+str(MR).split(':')[1]+'-'+str(MR).split(':')[2]+'_'+str(ssT)+'.csv' #type_rx_tx_ts_te_MR.csv
     abs_file = os.path.join(base_dir, filename)
     

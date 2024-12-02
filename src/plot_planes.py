@@ -139,13 +139,13 @@ def p(t,f,c,MR,ssT,lat1,lon1,lat2,lon2):#draw map and all plots
                 
     
     #saving plot as img
-    base_dir = "C:/Users/Lyiyang1/Desktop/wspr/data/plot"
+    base_dir = "C:\\Users\\caden\\Documents\\code\\Real\\WSPR\\data\\plot"
     filename = f+'_'+c[0:10]+'_'+c[11:13]+'-'+c[14:16]+'-'+c[17:19]+'_'+str(MR).split(':')[0]+'-'+str(MR).split(':')[1]+'-'+str(MR).split(':')[2]+'_'+str(ssT)+str(lat1)+'_'+str(lon1)+'_'+str(lat2)+'_'+str(lon2)+'.png' #type_rx_tx_ts_te_MR.txt
     abs_file = os.path.join(base_dir, filename)
     plt.title(filename, fontsize = 100)
     plt.savefig(abs_file, format="png", dpi=100)
-    plt.show()
-    plt.clf()#clear plot
+    #plt.show()
+    plt.close()
     
     print("plot,",time.process_time()-st)#check is slow
     

@@ -66,7 +66,7 @@ def print_json(tstation, tdata, ts, te, data, MR = None, ssT = None, rx = None, 
     else:
         tx = '_'+tx
     #file path and naming
-    base_dir = "C:/Users/Lyiyang1/Desktop/wspr/data/json"
+    base_dir = "C:\\Users\\caden\\Documents\\code\\Real\\WSPR\\data\\json"
     filename = tstation+"_"+tdata+rx+tx+'_'+ts.strftime("%Y-%m-%d_%H-%M-%S")+'_'+te.strftime("%Y-%m-%d_%H-%M-%S") #type_rx_tx_ts_te_MR_ssT.txt
     if tdata != 'r':
         filename += '_'+str(MR).split(':')[0]+'-'+str(MR).split(':')[1]+'-'+str(MR).split(':')[2]+'_'+str(ssT)
@@ -94,7 +94,7 @@ def read_json(tstation, tdata, ts, te, MR = None, ssT = None, rx = None, tx = No
     else:
         tx = '_'+tx
     #file path and naming
-    base_dir = "C:/Users/Lyiyang1/Desktop/wspr/data/json"
+    base_dir = 'C:\\Users\\caden\\Documents\\code\\Real\\WSPR\\data\\json'
     filename = tstation+"_"+tdata+rx+tx+'_'+ts.strftime("%Y-%m-%d_%H-%M-%S")+'_'+te.strftime("%Y-%m-%d_%H-%M-%S") #type_rx_tx_ts_te_MR_ssT.txt
     if tdata != 'r':
         filename += '_'+str(MR).split(':')[0]+'-'+str(MR).split(':')[1]+'-'+str(MR).split(':')[2]+'_'+str(ssT)
