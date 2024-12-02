@@ -195,7 +195,8 @@ def intersect_point_sp(d):#list of dict with SS_freq, SS_snr,SS_drift,id, time, 
     
     return p
 
-def intersect_point_lp(d):#list of dict with SS_freq, SS_snr,SS_drift,id, time, band, rx_sign, rx_lat, rx_lon, rx_loc, tx_sign, tx_lat, tx_lon, tx_loc, distance, azimuth, rx_azimuth, *frequency, power, *snr, *drift, version, code
+def intersect_point_lp(d, mSNR):#list of dict with SS_freq, SS_snr,SS_drift,id, time, band, rx_sign, rx_lat, rx_lon, rx_loc, tx_sign, tx_lat, tx_lon, tx_loc, distance, azimuth, rx_azimuth, *frequency, power, *snr, *drift, version, code
+        
     st = time.process_time()    
     a = {}    
     #arranging by time
@@ -243,7 +244,7 @@ def intersect_point_lp(d):#list of dict with SS_freq, SS_snr,SS_drift,id, time, 
                         Rtx11 = ((2 * math.pi * R - Dgc(R,point[0],point[1],s1.get('tx_lat'),s1.get('tx_lon')))/Dgctotal11)*Dhtotal(Dgctotal11, N11, Hiono)
                     SNR11 = SNR(s1.get('power'),s1.get('frequency'),rcs1,Rrx11,Rtx11,N11)
                     #print('11',SNR11)
-                    if SNR11 > -30:
+                    if SNR11 > mSNR:
                         
                         #point 1 with spot 2
                         if shortest_hdist(s2.get('rx_lon'), s2.get('tx_lon'), [-180, 180]) > abs(point[1]-s2.get('rx_lon')) and shortest_hdist(s2.get('rx_lon'), s2.get('tx_lon'), [-180, 180]) > abs(point[1]-s2.get('tx_lon')):
@@ -262,7 +263,7 @@ def intersect_point_lp(d):#list of dict with SS_freq, SS_snr,SS_drift,id, time, 
                             Rtx12 = ((2 * math.pi * R - Dgc(R,point[0],point[1],s2.get('tx_lat'),s2.get('tx_lon')))/Dgctotal12)*Dhtotal(Dgctotal12, N12, Hiono)
                         SNR12 = SNR(s2.get('power'),s2.get('frequency'),rcs2,Rrx12,Rtx12,N12)
                         #print('12',SNR12)
-                        if SNR12 > -30:
+                        if SNR12 > mSNR:
                             p.append([point[0],point[1],s1,s2])
                             
                     #point 2 with spot 1
@@ -283,7 +284,7 @@ def intersect_point_lp(d):#list of dict with SS_freq, SS_snr,SS_drift,id, time, 
                         Rtx21 = ((2 * math.pi * R - Dgc(R,point[2],point[3],s1.get('tx_lat'),s1.get('tx_lon')))/Dgctotal21)*Dhtotal(Dgctotal21, N21, Hiono)
                     SNR21 = SNR(s1.get('power'),s1.get('frequency'),rcs1,Rrx21,Rtx21,N21)
                     #print('21',SNR21)
-                    if SNR21 > -30:
+                    if SNR21 > mSNR:
                         #point 1 with spot 2
                         if shortest_hdist(s2.get('rx_lon'), s2.get('tx_lon'), [-180, 180]) > abs(point[3]-s2.get('rx_lon')) and shortest_hdist(s2.get('rx_lon'), s2.get('tx_lon'), [-180, 180]) > abs(point[3]-s2.get('tx_lon')):
                             Dgctotal22 = Dgc(R,s2.get('rx_lat'),s2.get('rx_lon'),s2.get('tx_lat'),s2.get('tx_lon'))
@@ -301,7 +302,7 @@ def intersect_point_lp(d):#list of dict with SS_freq, SS_snr,SS_drift,id, time, 
                             Rtx22 = ((2 * math.pi * R - Dgc(R,point[2],point[3],s2.get('tx_lat'),s2.get('tx_lon')))/Dgctotal22)*Dhtotal(Dgctotal22, N22, Hiono)
                         SNR22 = SNR(s2.get('power'),s2.get('frequency'),rcs2,Rrx22,Rtx22,N22)
                         #print('22',SNR22)
-                        if SNR22 > -30:
+                        if SNR22 > mSNR:
                             p.append([point[2],point[3],s1,s2])
                         '''
                         mem.get(j).get(k).update([SNR11,SNR12,SNR21,SNR22])
