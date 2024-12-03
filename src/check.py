@@ -354,19 +354,24 @@ def intersect_point_lp(d, mSNR):#list of dict with SS_freq, SS_snr,SS_drift,id, 
     
     return p
 
-def crosscheck(d,p, mR, lat1, lon1, lat2, lon2):#data, planes, minimum radius, area of focus
+def crosscheck(d,p, lat1, lon1, lat2, lon2):#data, planes, minimum radius, area of focus
     mError = 0
     numOfData = 0
     for i in d:
         nearby = [int_MAX,[]]
         for j in p:
             #check if time and location is correct
-            if i[2].get('time') == j[0][0:4]+'-'+j[0][5:7]+'-'+j[0][8:10]+' '+j[1][0:2]+':'+j[1][3:5]+':00' and i[0] < lat1 and i[0] > lat2 and i[1] < lon1 and i[1] > lat2:
-                if Dgc(R,i[0],i[1],j[9],j[10]) <= nearby[0]:
-                    nearby.append([Dgc(R,i[0],i[1],j[9],j[10]),j])
+            #print(i[2].get('time')==j[0][0:4]+'-'+j[0][5:7]+'-'+j[0][8:10]+' '+j[1][0:2]+':'+j[1][3:5]+':00')
+            if i[2].get('time') == j[0][0:4]+'-'+j[0][5:7]+'-'+j[0][8:10]+' '+j[1][0:2]+':'+j[1][3:5]+':00' and i[0] > lat1 and i[0] < lat2 and i[1] > lon1 and i[1] < lat2:
+                #print(Dgc(R,i[0],i[1],int(j[9]),int(j[10])) < nearby[0])
+                if Dgc(R,i[0],i[1],int(j[9]),int(j[10])) <= nearby[0]:
+                    nearby=(Dgc(R,i[0],i[1],int(j[9]),int(j[10])),j)
+                    #print(nearby[0])
         mError += nearby[0]
+        
         numOfData += 1
     mError /= numOfData
+    #print(mError,numOfData,i[0],i[1],j[9],j[10],)
     return mError
                 
                 
@@ -389,5 +394,5 @@ if __name__ == "__main__":
     #print(intersect_point_lp([{'SS_freq': 1, 'SS_snr': 1, 'SS_drift': 1, 'id': '8100420947', 'time': '2024-09-01 02:00:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': -80, 'rx_lon': -80, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 80, 'tx_lon': 80, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 1, 'power': 23, 'snr': 1, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'SS_freq': 1, 'SS_snr': 1, 'SS_drift': 1, 'id': '8100420947', 'time': '2024-09-01 02:00:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': -80, 'rx_lon': -75, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 80, 'tx_lon': 80, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 1, 'power': 23, 'snr': 1, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1}]))
     #intersect_point_sp(A)
     d = [[0,0,{'time': '2024-01-01 00:00:00'}]]
-    p = ["2024/00/00","00:00:44.408827","?","?","?","?","?","?","?","","","?","?","?","?","?","?","?","?","?","PK-GQR","1733192741","CGK","QG523"]
-    print(crosscheck(d, p))
+    p = [["2024/01/01","00:00:44.408827","2","1","?","?","?","?","?","0","0","?","?","?","?","?","?","?","?","?","?","?","?","?"],["2024/01/01","00:00:44.408827","?","?","?","?","?","?","?","1","1","?","?","?","?","?","?","?","?","?","?","?","?","?"]]
+    print(crosscheck(d, p, -90, -180, 90, 180))

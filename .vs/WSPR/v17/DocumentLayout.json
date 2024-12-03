@@ -68,7 +68,7 @@
               "RelativeDocumentMoniker": "src\\check.py",
               "ToolTip": "C:\\Users\\caden\\Documents\\code\\Real\\WSPR\\src\\check.py",
               "RelativeToolTip": "src\\check.py",
-              "ViewState": "AQIAAHoBAAAAAAAAAAAAAIcBAAB1AAAA",
+              "ViewState": "AQIAAIUBAAAAAAAAAAAAAIwBAABHAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
               "WhenOpened": "2024-12-02T01:38:26.086Z",
               "EditorCaption": ""
@@ -83,8 +83,7 @@
               "RelativeToolTip": "src\\query.py",
               "ViewState": "AQIAADAAAAAAAAAAAAAAADoAAAAmAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2024-12-02T01:38:28.575Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-12-02T01:38:28.575Z"
             },
             {
               "$type": "Document",
@@ -96,8 +95,7 @@
               "RelativeToolTip": "src\\test.py",
               "ViewState": "AQIAABYAAAAAAAAAAAAAACAAAABnAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2024-12-02T01:38:29.619Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-12-02T01:38:29.619Z"
             },
             {
               "$type": "Document",
@@ -109,8 +107,7 @@
               "RelativeToolTip": "src\\plot_planes.py",
               "ViewState": "AQIAAGYAAAAAAAAAAAAAAJMAAAAHAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2024-12-02T01:37:53.063Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-12-02T01:37:53.063Z"
             }
           ]
         }
