@@ -20,9 +20,9 @@ mSNR = -30#minimun SNR
 
 #plot details
 mf = 'p'#a(all anomalies, takes in data from anomalies) i (intersecting lines and corresponding points, takes data from intersect_point) p(only points of intersection,  takes data from intersect_point) r(all spots)
-lat1 = -90#map lowest lat
-lon1 = -180#map lowest lon
-lat2 = 90#map highest lat
+lat1 = -60#map lowest lat
+lon1 = 150#map lowest lon
+lat2 = 0#map highest lat
 lon2 = 180#map highest lon
 c = "2024-09-01 03:00:00"#timestamp of plot
 #p = check.intersect_point_sp(a)#short path calculations only

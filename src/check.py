@@ -1,9 +1,11 @@
 import datetime
 import math
+from operator import ne
 import numpy as np
 import time
 import process
 import query
+import os
 
 #constants
 c = 299792458#m/s
@@ -16,6 +18,7 @@ pheight = 20
 plength = 70
 pheading = 0
 SPN = 4.9406564584124654e-324
+int_MAX = 2**63-1
 
 
 crx = [-149.958, 61.146] #lon, lat
@@ -106,7 +109,7 @@ def lg(v):
 def RCS(h,l,ra,f):
     return 4 * math.pi * h**2 * l**2 * math.sin(ra)**2 * f**2 / c**2
 
-def Dgc(r,lat1,lon1,lat2,lon2):
+def Dgc(r,lat1,lon1,lat2,lon2):#greatcircle distance between 2 points
     if r * math.acos(math.sin(lat1*math.pi/180) * math.sin(lat2*math.pi/180) + math.cos(lat1*math.pi/180) * math.cos(lat2*math.pi/180) * math.cos(lon2*math.pi/180- lon1*math.pi/180)) != 0:
         return r * math.acos(math.sin(lat1*math.pi/180) * math.sin(lat2*math.pi/180) + math.cos(lat1*math.pi/180) * math.cos(lat2*math.pi/180) * math.cos(lon2*math.pi/180- lon1*math.pi/180))
     return 1e-316#smallest float u can return in sypder
@@ -194,6 +197,33 @@ def intersect_point_sp(d):#list of dict with SS_freq, SS_snr,SS_drift,id, time, 
     query.print_json('all','a',s,e,p,MR,ssT)
     
     return p
+
+def read_bst(filename):
+    #date, time, ABSD S-Mode 1, S-Mode2, callsign, Departure airport code, ?, altitude, altitude, lat, lon, ?, ?, ?, ?, ?, ?, ?, reportor, aircraft type code, aircraft registration, ?, destination airport code, flight number
+
+    base_dir = 'C:\\Users\\caden\\Documents\\code\\Real\\WSPR\\data\\bst'
+    filename += '.bst'
+    abs_file = os.path.join(base_dir, filename)
+    #reading from json
+    with open(abs_file, 'r') as file: 
+        data = file.read()
+        print("read_bst,",time.process_time()-st)
+        d = ""
+        pd = []
+        o = []
+        for i in data:
+            if i == "\n":
+                pd.append(d)
+                d = ""
+                o.append(pd)
+                pd = []
+            elif i == ',':
+                pd.append(d)
+                d = ""
+            else:
+                d+=i
+        o.append(pd)
+    print(o)
 
 def intersect_point_lp(d, mSNR):#list of dict with SS_freq, SS_snr,SS_drift,id, time, band, rx_sign, rx_lat, rx_lon, rx_loc, tx_sign, tx_lat, tx_lon, tx_loc, distance, azimuth, rx_azimuth, *frequency, power, *snr, *drift, version, code
         
@@ -323,6 +353,24 @@ def intersect_point_lp(d, mSNR):#list of dict with SS_freq, SS_snr,SS_drift,id, 
     query.print_json('all','a',s,e,p,MR,ssT)
     
     return p
+
+def crosscheck(d,p, mR, lat1, lon1, lat2, lon2):#data, planes, minimum radius, area of focus
+    mError = 0
+    numOfData = 0
+    for i in d:
+        nearby = [int_MAX,[]]
+        for j in p:
+            #check if time and location is correct
+            if i[2].get('time') == j[0][0:4]+'-'+j[0][5:7]+'-'+j[0][8:10]+' '+j[1][0:2]+':'+j[1][3:5]+':00' and i[0] < lat1 and i[0] > lat2 and i[1] < lon1 and i[1] > lat2:
+                if Dgc(R,i[0],i[1],j[9],j[10]) <= nearby[0]:
+                    nearby.append([Dgc(R,i[0],i[1],j[9],j[10]),j])
+        mError += nearby[0]
+        numOfData += 1
+    mError /= numOfData
+    return mError
+                
+                
+                    
                     
 
 if __name__ == "__main__":  
@@ -338,5 +386,8 @@ if __name__ == "__main__":
     #A = [{'SS_freq': 1, 'SS_snr': 1, 'SS_drift': 1, 'id': '8100420947', 'time': '2024-07-24 09:26:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 1, 'power': 23, 'snr': 1, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'SS_freq': 1, 'SS_snr': 1, 'SS_drift': 1, 'id': '8100420947', 'time': '2024-07-24 09:26:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 2, 'power': 23, 'snr': -7, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'SS_freq': 1, 'SS_snr': 1, 'SS_drift': 1, 'id': '8100420947', 'time': '2024-07-24 09:28:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 1000000000000000000000000, 'power': 23, 'snr': 3, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'SS_freq': 1, 'SS_snr': 1, 'SS_drift': 1, 'id': '8100420947', 'time': '2024-07-24 09:30:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': 44.896, 'rx_lon': 7.208, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 39.563, 'tx_lon': 2.708, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 4, 'power': 23, 'snr': -10, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1}]
     #A = process.anomalies('r', MR, ssT, s, e)
     
-    print(intersect_point_lp([{'SS_freq': 1, 'SS_snr': 1, 'SS_drift': 1, 'id': '8100420947', 'time': '2024-09-01 02:00:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': -80, 'rx_lon': -80, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 80, 'tx_lon': 80, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 1, 'power': 23, 'snr': 1, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'SS_freq': 1, 'SS_snr': 1, 'SS_drift': 1, 'id': '8100420947', 'time': '2024-09-01 02:00:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': -80, 'rx_lon': -75, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 80, 'tx_lon': 80, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 1, 'power': 23, 'snr': 1, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1}]))
+    #print(intersect_point_lp([{'SS_freq': 1, 'SS_snr': 1, 'SS_drift': 1, 'id': '8100420947', 'time': '2024-09-01 02:00:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': -80, 'rx_lon': -80, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 80, 'tx_lon': 80, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 1, 'power': 23, 'snr': 1, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1},{'SS_freq': 1, 'SS_snr': 1, 'SS_drift': 1, 'id': '8100420947', 'time': '2024-09-01 02:00:00', 'band': 7, 'rx_sign': 'IU1QQM', 'rx_lat': -80, 'rx_lon': -75, 'rx_loc': 'JN34ov', 'tx_sign': 'EA6URP', 'tx_lat': 80, 'tx_lon': 80, 'tx_loc': 'JM19in', 'distance': 699, 'azimuth': 31, 'rx_azimuth': 213, 'frequency': 1, 'power': 23, 'snr': 1, 'drift': 1, 'version': 'WD_3.0.8', 'code': 1}]))
     #intersect_point_sp(A)
+    d = [[0,0,{'time': '2024-01-01 00:00:00'}]]
+    p = ["2024/00/00","00:00:44.408827","?","?","?","?","?","?","?","","","?","?","?","?","?","?","?","?","?","PK-GQR","1733192741","CGK","QG523"]
+    print(crosscheck(d, p))
