@@ -200,14 +200,13 @@ def intersect_point_sp(d):#list of dict with SS_freq, SS_snr,SS_drift,id, time, 
 
 def read_bst(filename):
     #date, time, ABSD S-Mode 1, S-Mode2, callsign, Departure airport code, ?, altitude, altitude, lat, lon, ?, ?, ?, ?, ?, ?, ?, reportor, aircraft type code, aircraft registration, ?, destination airport code, flight number
-
+    st = time.process_time()
     base_dir = 'C:\\Users\\caden\\Documents\\code\\Real\\WSPR\\data\\bst'
     filename += '.bst'
     abs_file = os.path.join(base_dir, filename)
     #reading from json
     with open(abs_file, 'r') as file: 
         data = file.read()
-        print("read_bst,",time.process_time()-st)
         d = ""
         pd = []
         o = []
@@ -223,7 +222,7 @@ def read_bst(filename):
             else:
                 d+=i
         o.append(pd)
-    print(o)
+    print("read_bst,",time.process_time()-st)
 
 def intersect_point_lp(d, mSNR):#list of dict with SS_freq, SS_snr,SS_drift,id, time, band, rx_sign, rx_lat, rx_lon, rx_loc, tx_sign, tx_lat, tx_lon, tx_loc, distance, azimuth, rx_azimuth, *frequency, power, *snr, *drift, version, code
         
@@ -355,6 +354,7 @@ def intersect_point_lp(d, mSNR):#list of dict with SS_freq, SS_snr,SS_drift,id, 
     return p
 
 def crosscheck(d,p, lat1, lon1, lat2, lon2):#data, planes, minimum radius, area of focus
+    st = time.process_time()   
     mError = 0
     numOfData = 0
     for i in d:
@@ -372,6 +372,7 @@ def crosscheck(d,p, lat1, lon1, lat2, lon2):#data, planes, minimum radius, area 
         numOfData += 1
     mError /= numOfData
     #print(mError,numOfData,i[0],i[1],j[9],j[10],)
+    print("crosscheck,",st)
     return mError
                 
                 

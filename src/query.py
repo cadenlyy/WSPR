@@ -28,7 +28,7 @@ import process
 #|code      |Int8                  |The code/mode flag see Wspr / FSt4W mode mappings below to find out what this values mean
 
 #query data from wspr.net
-def wsprlive_get(col, database, ts, te, rx = None, tx = None, l=None): #colums, database, start dateTime, end dateTime, rx_sign = None, tx_sign = None limit = None
+def wsprlive_get(col, database, ts, te, rx = None, tx = None, l = None, minlat = None, minlon = None, maxlat = None, maxlon = None): #colums, database, start dateTime, end dateTime, rx_sign = None, tx_sign = None limit = None
     st = time.process_time()    
     # put together the request url
     q = "SELECT " + col + " FROM " + database + " WHERE time >= '" + ts + "' AND time < '" + te + "'"
@@ -39,7 +39,9 @@ def wsprlive_get(col, database, ts, te, rx = None, tx = None, l=None): #colums, 
         q += " AND tx_sign == '" + tx + "'"
     if l != None:
         q += " Limit " + str(l)
-        
+    if l != None:
+        q += " Limit " + str(l)
+
     url = "https://db1.wspr.live/?query=" + urllib.parse.quote_plus(q + " FORMAT JSON")
       
     # download contents from wspr.live
@@ -112,13 +114,16 @@ def wspr_to_json(t, ts, te, rx = None, tx = None):
     q = wsprlive_get("*", "rx", str(ts), str(te),rx, tx)
     print('wspr.rx query successful')
     print("Wspr_to_json,",time.process_time()-st)#incase wspr dies
+    print(q)
     print_json(t, 'r', ts, te, q, rx = rx, tx = tx)
 
 if __name__ == "__main__":
     #print(wsprlive_get("*", "rx", '2024-09-01 00:00:00', '2024-09-01 07:00:00'))
-    s = datetime.datetime(2024,9,1,0,0,0) #Y,M,D,h,m,s
-    e = datetime.datetime(2024,9,1,7,0,0)
+    s = datetime.datetime(2022,11,1,0,0,0) #Y,M,D,h,m,s
+    e = datetime.datetime(2024,12,1,15,0,0)
+    tx = 'DL4DTL'
+    rx = 'SO5CW'
     
     #process.print_csv('all_UTC',s,e,MR,wsprlive_get("*", "rx", str(s), str(e)))
     
-    wspr_to_json('all', s, e)
+    wspr_to_json('pair', s, e, rx, tx)

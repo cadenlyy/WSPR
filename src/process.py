@@ -42,14 +42,14 @@ def print_csv(tstations, tdata, ts, te, MR, ssT, data, rx = None, tx = None):#ou
     base_dir = "C:\\Users\\caden\\Documents\\code\\Real\\WSPR\\data\\csv"
     filename = tstations+'_'+tdata+rx+tx+'_'+ts.strftime("%Y-%m-%d_%H-%M-%S")+'_'+te.strftime("%Y-%m-%d_%H-%M-%S")+'_'+str(MR).split(':')[0]+'-'+str(MR).split(':')[1]+'-'+str(MR).split(':')[2]+'_'+str(ssT)+'.csv' #type_rx_tx_ts_te_MR.csv
     abs_file = os.path.join(base_dir, filename)
-    
-    #writing to csv file
-    with open(abs_file, 'w', newline='') as csvfile:
-        fieldnames = list(data[0].keys())
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        writer.writeheader()
-        writer.writerows(data)
-    print('print_csv,',time.process_time()-st)
+    if len(data) != 0:
+        #writing to csv file
+        with open(abs_file, 'w', newline='') as csvfile:
+            fieldnames = list(data[0].keys())
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(data)
+        print('print_csv,',time.process_time()-st)
         
 #main processing and calculation of anomalous data
 def anomalies_snr(f, MR, ssT, ts, te, rx = None, tx = None):
@@ -168,7 +168,7 @@ def anomalies_snr(f, MR, ssT, ts, te, rx = None, tx = None):
     #print_csv('pair','a',ts,te,MR,ssT,a,rx,tx)
     
     #print(transmitions)
-    print("anomalies,",time.process_time()-st)#checking code speed
+    print("anomalies_snr,",time.process_time()-st)#checking code speed
     
     return a
 
@@ -313,7 +313,7 @@ def anomalies_all(f, MR, ssT, ts, te, rx = None, tx = None):
     #print_csv('pair','a',ts,te,MR,ssT,a,rx,tx)
     
     #print(transmitions)
-    print("anomalies,",time.process_time()-st)#checking code speed
+    print("anomalies_all,",time.process_time()-st)#checking code speed
     
     return a       
 
@@ -325,7 +325,7 @@ def anomalies_freqsnr(f, MR, ssT, ts, te, rx = None, tx = None):
         if rx == None and tx == None:
             q = query.read_json('all', 'r', ts, te)
         else:
-            q = query.read_json('pair', 'r', ts, te, rx, tx)
+            q = query.read_json('pair', 'r', ts, te, rx = rx, tx = tx)
     if f == 'q':
         q = query.wsprlive_get("*", "rx", str(ts), str(te), rx, tx)
     elif f == 't': #testcase
@@ -443,11 +443,11 @@ def anomalies_freqsnr(f, MR, ssT, ts, te, rx = None, tx = None):
 
     #print_csv('allb','t',ts,te,MR,ssT,d)
     #print_csv('all','a',ts,te,MR,ssT,a)
-    #print_csv('pair','t',ts,te,MR,ssT,d,rx,tx)
+    print_csv('pair','t',ts,te,MR,ssT,d,rx,tx)
     #print_csv('pair','a',ts,te,MR,ssT,a,rx,tx)
     
     #print(transmitions)
-    print("anomalies,",time.process_time()-st)#checking code speed
+    print("anomalies_freqsnr,",time.process_time()-st)#checking code speed
     
     return a
 
