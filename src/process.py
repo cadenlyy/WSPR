@@ -441,9 +441,9 @@ def anomalies_freqsnr(f, MR, ssT, ts, te, rx = None, tx = None):
                                 a.append({'SS_freq': p[0], 'SS_snr': p[1], 'id': p[2], 'time': p[3], 'band': p[4], 'rx_sign': p[5], 'rx_lat': p[6], 'rx_lon': p[7], 'rx_loc': p[8], 'tx_sign': p[9], 'tx_lat': p[10], 'tx_lon': p[11], 'tx_loc': p[12], 'distance': p[13], 'azimuth': p[14], 'rx_azimuth': p[15], 'frequency': p[16], 'power': p[17], 'snr': p[18], 'drift': p[19], 'version': p[20], 'code': p[21]})
                         d.append({'SS_freq': i[1][0][j][0], 'SS_snr': i[1][0][j][1], 'id': i[1][0][j][2], 'time': i[1][0][j][3], 'band': i[1][0][j][4], 'rx_sign': i[1][0][j][5], 'rx_lat': i[1][0][j][6], 'rx_lon': i[1][0][j][7], 'rx_loc': i[1][0][j][8], 'tx_sign': i[1][0][j][9], 'tx_lat': i[1][0][j][10], 'tx_lon': i[1][0][j][11], 'tx_loc': i[1][0][j][12], 'distance': i[1][0][j][13], 'azimuth': i[1][0][j][14], 'rx_azimuth': i[1][0][j][15], 'frequency': i[1][0][j][16], 'power': i[1][0][j][17], 'snr': i[1][0][j][18], 'drift': i[1][0][j][19], 'version': i[1][0][j][20], 'code': i[1][0][j][21], "sum_freq": i[1][1][0],"sum_snr": i[1][1][1],"sum_freq^2": i[1][1][2],"sum_snr^2": i[1][1][3],"mean_freq":i[1][1][4],"mean_snr":i[1][1][5],"SD_freq":i[1][1][6],"SD_snr":i[1][1][7],"numOfSpots":i[1][1][8],"SW_freq":i[1][1][9][0],"SW_snr":i[1][1][9][1],"SW_freq^2":i[1][1][9][2],"SW_snr^2":i[1][1][9][3]})
 
-    #print_csv('allb','t',ts,te,MR,ssT,d)
+    #print_csv('allb','t',ts,te,MR,ssT,d)                    
     #print_csv('all','a',ts,te,MR,ssT,a)
-    print_csv('pair','t',ts,te,MR,ssT,d,rx,tx)
+    print_csv('pair','t', ts, te, MR, ssT, sorted(d, key=lambda k: k['time']), rx, tx)
     #print_csv('pair','a',ts,te,MR,ssT,a,rx,tx)
     
     #print(transmitions)

@@ -1,34 +1,31 @@
-import os
-import json
-import time
-import datetime
+import numpy as np
+import matplotlib.pyplot as plt
+import scipy
 
-filename = "20241121_092952"
+data_to_plot = [1,2,3,4,5,1,1,2,2,4]
 
-st = time.process_time()
-base_dir = 'C:\\Users\\caden\\Documents\\code\\Real\\WSPR\\data\\bst'
-filename += '.bst'
-abs_file = os.path.join(base_dir, filename)
-#reading from json
-with open(abs_file, 'r') as file: 
-    data = file.read()
-    print("read_bst,",time.process_time()-st)
-    d = ""
-    pd = []
-    o = []
-    for i in data:
-        if i == "\n":
-            pd.append(d)
-            d = ""
-            o.append(pd)
-            pd = []
-        elif i == ',':
-            pd.append(d)
-            d = ""
-        elif i != '"':
-            d+=i
+#plot pretty histogram
+fig3 = plt.figure(figsize = (5,4), dpi = 150)
 
-for i in o:
-    print(i)
-    print(datetime.datetime(int(i[0][0:4]),int(i[0][5:7]),int(i[0][8:10]),int(i[1][0:2]),int(i[1][3:5])))
-        
+counts, bins, patches = plt.hist(data_to_plot,5)
+
+print(counts)
+
+# fit Gaussian function
+
+#define function to fit
+def gaussian(x, a, mu, sigma):
+    return a*np.exp(-(x-mu)**2/(2*sigma**2))
+
+#calculate bin center to use as y data to fit
+bins = (bins[:-1] + np.diff(bins) / 2)
+
+#create an arbitrary x axis to fit
+x_values_to_fit = np.linspace(0,6,100)
+
+# fit the data and plot the result
+param, cov = scipy.optimize.curve_fit(gaussian, xdata = bins, ydata = counts, maxfev=5000)
+plt.plot(x_values_to_fit, gaussian(x_values_to_fit, *param), '-', color = 'purple', lw=1.5, label = "Gaussian")
+
+
+plt.show()

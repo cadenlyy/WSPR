@@ -19,6 +19,9 @@ plength = 70
 pheading = 0
 SPN = 4.9406564584124654e-324
 int_MAX = 2**63-1
+tTransmittion = 110.6#S transmittion time 
+fSample = 12000
+N = tTransmittion * fSample #number of samples
 
 
 crx = [-149.958, 61.146] #lon, lat
@@ -119,10 +122,9 @@ def Dhtotal(Dgctotal,n,h):
 
 def SNR(p,f,rcs,rrx,rtx,n):#power transmitted(dB), frequency transmitted, RCS of target, distance from tx to target, distance from rx to target, number of hops
     noise = 10 * lg(k * t0 * B)
-    signal = p - 30 + 20 * lg(c) - 20 * lg(f) + 10 * lg(rcs) - 30 * lg(4*math.pi) - 20 * lg(rrx) - 20 * lg(rtx)
+    signal = p - 30 + 20 * lg(c) - 20 * lg(f) + 10 * lg(rcs) - 30 * lg(4*math.pi) - 20 * lg(rrx) - 20 * lg(rtx) + 10 * lg(N)
     #print(signal, noise, losses)
     return signal - noise 
-
         
 def Hr(a,latp,lonp,lats,lons):#heading of plane relative to north
     #relative heading

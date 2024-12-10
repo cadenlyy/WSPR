@@ -60,16 +60,22 @@ def print_json(tstation, tdata, ts, te, data, MR = None, ssT = None, rx = None, 
     
     #checking if one_pair or all_pairs
     if rx == None:
-        rx = ''
+        frx = ''
     else:
-        rx = '_'+rx
+        frx = '_'
+        for i in rx:
+            if i != '/' and i != '\\':
+                frx+=i
     if tx == None:
-        tx = ''
+        ftx = ''
     else:
-        tx = '_'+tx
+        ftx = '_'
+        for i in tx:
+            if i != '/' and i != '\\':
+                ftx+=i
     #file path and naming
     base_dir = "C:\\Users\\caden\\Documents\\code\\Real\\WSPR\\data\\json"
-    filename = tstation+"_"+tdata+rx+tx+'_'+ts.strftime("%Y-%m-%d_%H-%M-%S")+'_'+te.strftime("%Y-%m-%d_%H-%M-%S") #type_rx_tx_ts_te_MR_ssT.txt
+    filename = tstation+"_"+tdata+frx+ftx+'_'+ts.strftime("%Y-%m-%d_%H-%M-%S")+'_'+te.strftime("%Y-%m-%d_%H-%M-%S") #type_rx_tx_ts_te_MR_ssT.txt
     if tdata != 'r':
         filename += '_'+str(MR).split(':')[0]+'-'+str(MR).split(':')[1]+'-'+str(MR).split(':')[2]+'_'+str(ssT)
     filename += '.txt'
@@ -88,16 +94,22 @@ def read_json(tstation, tdata, ts, te, MR = None, ssT = None, rx = None, tx = No
     st = time.process_time()
     #checking if one_pair or all_pairs
     if rx == None:
-        rx = ''
+        frx = ''
     else:
-        rx = '_'+rx
+        frx = '_'
+        for i in rx:
+            if i != '/' and i != '\\':
+                frx+=i
     if tx == None:
-        tx = ''
+        ftx = ''
     else:
-        tx = '_'+tx
+        ftx = '_'
+        for i in tx:
+            if i != '/' and i != '\\':
+                ftx+=i
     #file path and naming
     base_dir = 'C:\\Users\\caden\\Documents\\code\\Real\\WSPR\\data\\json'
-    filename = tstation+"_"+tdata+rx+tx+'_'+ts.strftime("%Y-%m-%d_%H-%M-%S")+'_'+te.strftime("%Y-%m-%d_%H-%M-%S") #type_rx_tx_ts_te_MR_ssT.txt
+    filename = tstation+"_"+tdata+frx+ftx+'_'+ts.strftime("%Y-%m-%d_%H-%M-%S")+'_'+te.strftime("%Y-%m-%d_%H-%M-%S") #type_rx_tx_ts_te_MR_ssT.txt
     if tdata != 'r':
         filename += '_'+str(MR).split(':')[0]+'-'+str(MR).split(':')[1]+'-'+str(MR).split(':')[2]+'_'+str(ssT)
     filename += '.txt'
@@ -114,7 +126,7 @@ def wspr_to_json(t, ts, te, rx = None, tx = None):
     q = wsprlive_get("*", "rx", str(ts), str(te),rx, tx)
     print('wspr.rx query successful')
     print("Wspr_to_json,",time.process_time()-st)#incase wspr dies
-    print(q)
+    #print(q)
     print_json(t, 'r', ts, te, q, rx = rx, tx = tx)
 
 if __name__ == "__main__":
