@@ -1,13 +1,13 @@
 from ctypes.wintypes import LPDWORD, LPFILETIME
+from xmlrpc.client import DateTime
 import process
 import query
-import plot_planes
+import plot_data
 import check
 import datetime
 from mpl_toolkits.basemap import Basemap
 import matplotlib.pyplot as plt
 import numpy as np
-
 import os
 import math
 
@@ -99,18 +99,15 @@ for i in range(len(data)):
 print(nos)
 '''
 
-
 #query details
 s = datetime.datetime(2022,11,1,0,0,0) #Y,M,D,h,m,s
-e = datetime.datetime(2022,11,5,23,59,0)
+e = datetime.datetime(2022,11,1,23,59,0)
 qf = 'pair'
 rx = 'KFS'
 tx = 'KG5QFD'
 query.wspr_to_json(qf, s, e, rx, tx)
 #q = query.wsprlive_get('*','rx',s,e,rx,tx)
-'''
 
-'''
 #processing details
 MR = datetime.timedelta(minutes = 180)
 ssT = 1 #Minimum standard score
@@ -126,7 +123,16 @@ clat2 = 0
 clon2 = 180
 #p = check.read_bst("1")
 
+#hypothesis testing
+v = []
+for i in a:
+    v.append(i.get('snr'))
+    
+d = plot_data.subtract_trend(v,100)
+plot_data.fit(d, 100, 100, rx, tx, s, e, 'sub')
+plot_data.fit(v, 100, 100, rx, tx, s, e, 'presub')
 
+'''
 #plot details
 mf = 'p'#a(all anomalies, takes in data from anomalies) i (intersecting lines and corresponding points, takes data from intersect_point) p(only points of intersection,  takes data from intersect_point) r(all spots)
 lat1 = -90#map lowest lat
@@ -136,9 +142,10 @@ lon2 = 180#map highest lon
 c = "2024-09-01 03:00:00"#timestamp of plot
 #p = check.intersect_point_sp(a)#short path calculations only
 p = check.intersect_point_lp(a,mSNR)#consider long path and check using SNR calculations
+'''
 
 '''
-# plot for multiple time stamps
+#plot for multiple time stamps
 for m in range(0,60,2):
     if(m < 10):
         c = '2024-09-01 03:0'+str(m)+':00'

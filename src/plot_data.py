@@ -8,6 +8,7 @@ import time
 import process
 import query
 import os
+import scipy
 
 class plane: #maintain the necessary details for each plane
     lat = 0
@@ -82,6 +83,9 @@ def fulldrawgreatcircle(maplength,p1_lon, p1_lat, p2_lon, p2_lat, m, linewidth =
     fdrawgreatcircle(maplength, p1_lon, p1_lat, p2_lon/abs(p2_lon)*-180+p2_lon, -p2_lat, m, linewidth = linewidth, c = c,zorder = zorder)
     fdrawgreatcircle(maplength, p1_lon/abs(p1_lon)*-180+p1_lon, -p1_lat, p2_lon/abs(p2_lon)*-180+p2_lon, -p2_lat, m, linewidth = linewidth, c = c,zorder = zorder)
     
+def gaussian(x, a, mu, sigma):
+    return a*np.exp(-(x-mu)**2/(2*sigma**2))
+
 def p(t,f,c,MR,ssT,lat1,lon1,lat2,lon2):#draw map and all plots
     #plot naming convention
     #type_currenttime_MR,ssT,lat1,lon1,lat2,lon2
@@ -148,6 +152,63 @@ def p(t,f,c,MR,ssT,lat1,lon1,lat2,lon2):#draw map and all plots
     plt.close()
     
     print("plot,",time.process_time()-st)#check is slow
+    
+def subtract_trend(v,r):#takes in data that is sorted by time
+    sw = 0
+    subdata = []
+    right = 0
+    left = 0
+    num = 0
+    for i in range(len(v)):
+        if i < r:
+            sw += v[i]
+            right += 1
+            num += 1
+        elif len(v)-i < r:
+            break
+        else:
+            for j in range(left, i+1):
+                if i-j > r:
+                    sw -= v[j]
+                    num -= 1
+                else:
+                    left = j
+                    break
+            for j in  range(right, len(v)):
+                if j-i <= r:
+                    sw += v[j]
+                    num += 1
+                else:
+                    right = j
+                    break
+            subdata.append(v[i]-sw/num)
+    return subdata
+    
+        
+    
+def fit(v,b,gs,rx,tx,s,e,n=None):
+    fig = plt.figure(figsize=(100,60))
+    counts, bins, patches = plt.hist(v,bins = b)
+
+    #calculate bin center to use as y data to fit
+    bins = (bins[:-1] + np.diff(bins) / 2)
+
+    #create an arbitrary x axis to fit
+    x_values_to_fit = np.linspace(min(v),max(v),gs)
+    
+    # fit the data and plot the result
+    param, cov = scipy.optimize.curve_fit(gaussian, bins, counts)
+    
+    plt.plot(x_values_to_fit, gaussian(x_values_to_fit, *param),linewidth = 10)
+    
+    filename = rx+'_'+tx+'_'+s.strftime("%Y-%m-%d_%H-%M-%S")+'_'+e.strftime("%Y-%m-%d_%H-%M-%S")+'_'+str(b)+'_'+n
+    plt.title(filename)
+    base_dir = "C:\\Users\\caden\\Documents\\code\\Real\\WSPR\\data\\plot"
+    abs_file = os.path.join(base_dir, filename)
+    plt.savefig(abs_file)
+    plt.show()
+    plt.close()
+
     
 if __name__ == "__main__":  
     ts = datetime.datetime(2024,9,1,0,0,0) #Y,M,D,h,m,s
