@@ -7,6 +7,7 @@ import datetime
 from mpl_toolkits.basemap import Basemap
 import matplotlib.pyplot as plt
 import numpy as np
+
 import os
 import math
 
@@ -107,7 +108,9 @@ rx = 'KFS'
 tx = 'KG5QFD'
 query.wspr_to_json(qf, s, e, rx, tx)
 #q = query.wsprlive_get('*','rx',s,e,rx,tx)
+'''
 
+'''
 #processing details
 MR = datetime.timedelta(minutes = 180)
 ssT = 1 #Minimum standard score
