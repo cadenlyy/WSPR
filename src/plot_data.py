@@ -200,13 +200,15 @@ def fit(v,b,gs,rx,tx,s,e,n=None):
     param, cov = scipy.optimize.curve_fit(gaussian, bins, counts)
     
     plt.plot(x_values_to_fit, gaussian(x_values_to_fit, *param),linewidth = 10)
+    plt.xticks(fontsize = 100) 
+    plt.yticks(fontsize = 100) 
     
     filename = rx+'_'+tx+'_'+s.strftime("%Y-%m-%d_%H-%M-%S")+'_'+e.strftime("%Y-%m-%d_%H-%M-%S")+'_'+str(b)+'_'+n
-    plt.title(filename)
+    plt.title(filename, fontsize = 100)
     base_dir = "C:\\Users\\caden\\Documents\\code\\Real\\WSPR\\data\\plot"
     abs_file = os.path.join(base_dir, filename)
     plt.savefig(abs_file)
-    plt.show()
+    #plt.show()
     plt.close()
 
     

@@ -76,20 +76,84 @@ def print_json(tstation, tdata, ts, te, data, MR = None, ssT = None, rx = None, 
     #file path and naming
     base_dir = "C:\\Users\\caden\\Documents\\code\\Real\\WSPR\\data\\json"
     filename = tstation+"_"+tdata+frx+ftx+'_'+ts.strftime("%Y-%m-%d_%H-%M-%S")+'_'+te.strftime("%Y-%m-%d_%H-%M-%S") #type_rx_tx_ts_te_MR_ssT.txt
-    if tdata != 'r':
+    if tdata != 'r' and tdata != 'd':
         filename += '_'+str(MR).split(':')[0]+'-'+str(MR).split(':')[1]+'-'+str(MR).split(':')[2]+'_'+str(ssT)
     filename += '.txt'
     abs_file = os.path.join(base_dir, filename)
     #writing to json
     with open(abs_file, 'w') as file: 
         file.write(json.dumps(data))
+        
+def clear_json(tstation, tdata, ts, te, MR = None, ssT = None, rx = None, tx = None):#type, ts, te, MR, data, *rx, *tx
+    #json file naming convention
+    #typestations_typedata_rx_tx_starttime_endtime_MR_ssT
+    #typestations: all(all stations) pair(one pair of stations)
+    #typedata: t(all transmited and processed data) a(all anomalous transmition data no processing data) r(all raw data with no processing data, MR and ssT not in name)
+    
+    #checking if one_pair or all_pairs
+    if rx == None:
+        frx = ''
+    else:
+        frx = '_'
+        for i in rx:
+            if i != '/' and i != '\\':
+                frx+=i
+    if tx == None:
+        ftx = ''
+    else:
+        ftx = '_'
+        for i in tx:
+            if i != '/' and i != '\\':
+                ftx+=i
+    #file path and naming
+    base_dir = "C:\\Users\\caden\\Documents\\code\\Real\\WSPR\\data\\json"
+    filename = tstation+"_"+tdata+frx+ftx+'_'+ts.strftime("%Y-%m-%d_%H-%M-%S")+'_'+te.strftime("%Y-%m-%d_%H-%M-%S") #type_rx_tx_ts_te_MR_ssT.txt
+    if tdata != 'r' and tdata != 'd':
+        filename += '_'+str(MR).split(':')[0]+'-'+str(MR).split(':')[1]+'-'+str(MR).split(':')[2]+'_'+str(ssT)
+    filename += '.txt'
+    abs_file = os.path.join(base_dir, filename)
+    #writing to json
+    open(abs_file, 'w').close()
+
+        
+def append_json(tstation, tdata, ts, te, data, MR = None, ssT = None, rx = None, tx = None):#type, ts, te, MR, data, *rx, *tx
+    #json file naming convention
+    #typestations_typedata_rx_tx_starttime_endtime_MR_ssT
+    #typestations: all(all stations) pair(one pair of stations)
+    #typedata: t(all transmited and processed data) a(all anomalous transmition data no processing data) r(all raw data with no processing data, MR and ssT not in name)
+    
+    #checking if one_pair or all_pairs
+    if rx == None:
+        frx = ''
+    else:
+        frx = '_'
+        for i in rx:
+            if i != '/' and i != '\\':
+                frx+=i
+    if tx == None:
+        ftx = ''
+    else:
+        ftx = '_'
+        for i in tx:
+            if i != '/' and i != '\\':
+                ftx+=i
+    #file path and naming
+    base_dir = "C:\\Users\\caden\\Documents\\code\\Real\\WSPR\\data\\json"
+    filename = tstation+"_"+tdata+frx+ftx+'_'+ts.strftime("%Y-%m-%d_%H-%M-%S")+'_'+te.strftime("%Y-%m-%d_%H-%M-%S") #type_rx_tx_ts_te_MR_ssT.txt
+    if tdata != 'r' and tdata != 'd':
+        filename += '_'+str(MR).split(':')[0]+'-'+str(MR).split(':')[1]+'-'+str(MR).split(':')[2]+'_'+str(ssT)
+    filename += '.txt'
+    abs_file = os.path.join(base_dir, filename)
+    #writing to json
+    with open(abs_file, 'a') as file: 
+        file.write('%s,' %data)
 
 #reading data from json to accomodate large amt of data
 def read_json(tstation, tdata, ts, te, MR = None, ssT = None, rx = None, tx = None):
     #json file naming convention
     #typestations_typedata_rx_tx_starttime_endtime_MR_ssT
     #typestations: all(all stations) pair(one pair of stations)
-    #typedata: t(all transmited and processed data) a(all anomalous transmition data no processing data) r(all raw data with no processing data)
+    #typedata: t(all transmited and processed data) a(all anomalous transmition data no processing data) r(all raw data with no processing data) p(all intersections of anomalous data with anomalous link data) psh(all short path intersections of anomalous data with anomalous link data) plp(all possible intersections of anomalous data with anomalous link data) d(distance from closes plane to point)
     
     st = time.process_time()
     #checking if one_pair or all_pairs

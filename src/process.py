@@ -31,16 +31,22 @@ def print_csv(tstations, tdata, ts, te, MR, ssT, data, rx = None, tx = None):#ou
     st = time.process_time()    
     #check or one pair or multiple    
     if rx == None:
-        rx = ''
+        frx = ''
     else:
-        rx = '_'+rx
+        frx = '_'
+        for i in rx:
+            if i != '/' and i != '\\':
+                frx+=i
     if tx == None:
-        tx = ''
+        ftx = ''
     else:
-        tx = '_'+tx
+        ftx = '_'
+        for i in tx:
+            if i != '/' and i != '\\':
+                ftx+=i
     #file path and nameing
     base_dir = "C:\\Users\\caden\\Documents\\code\\Real\\WSPR\\data\\csv"
-    filename = tstations+'_'+tdata+rx+tx+'_'+ts.strftime("%Y-%m-%d_%H-%M-%S")+'_'+te.strftime("%Y-%m-%d_%H-%M-%S")+'_'+str(MR).split(':')[0]+'-'+str(MR).split(':')[1]+'-'+str(MR).split(':')[2]+'_'+str(ssT)+'.csv' #type_rx_tx_ts_te_MR.csv
+    filename = tstations+'_'+tdata+frx+ftx+'_'+ts.strftime("%Y-%m-%d_%H-%M-%S")+'_'+te.strftime("%Y-%m-%d_%H-%M-%S")+'_'+str(MR).split(':')[0]+'-'+str(MR).split(':')[1]+'-'+str(MR).split(':')[2]+'_'+str(ssT)+'.csv' #type_rx_tx_ts_te_MR.csv
     abs_file = os.path.join(base_dir, filename)
     if len(data) != 0:
         #writing to csv file
@@ -453,13 +459,13 @@ def anomalies_freqsnr(f, MR, ssT, ts, te, rx = None, tx = None):
     d = sorted(d, key = lambda k: k.get('time'))
     #print_csv('allb','t',ts,te,MR,ssT,d)                    
     #print_csv('all','a',ts,te,MR,ssT,a)
-    #print_csv('pair','t', ts, te, MR, ssT, sorted(d, key=lambda k: k['time']), rx, tx)
+    print_csv('pair','t', ts, te, MR, ssT, sorted(d, key=lambda k: k['time']), rx, tx)
     #print_csv('pair','a',ts,te,MR,ssT,a,rx,tx)
     
     #print(transmitions)
     print("anomalies_freqsnr,",time.process_time()-st)#checking code speed
     
-    return d
+    return a
 
 if __name__ == "__main__":
     #process details

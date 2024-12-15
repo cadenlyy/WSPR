@@ -1,3 +1,4 @@
+from ast import Num
 import datetime
 import math
 from operator import ne
@@ -13,7 +14,7 @@ k = 1.38*10**-23#j/k
 t0 = 290#k
 B = 6
 R = 6378000#m radius of earth
-Hiono = 300000#m
+Hiono = 100000#m
 pheight = 20
 plength = 70
 pheading = 0
@@ -113,6 +114,7 @@ def RCS(h,l,ra,f):
     return 4 * math.pi * h**2 * l**2 * math.sin(ra)**2 * f**2 / c**2
 
 def Dgc(r,lat1,lon1,lat2,lon2):#greatcircle distance between 2 points
+    #print(r,lat1,lon1,lat2,lon2)
     if r * math.acos(math.sin(lat1*math.pi/180) * math.sin(lat2*math.pi/180) + math.cos(lat1*math.pi/180) * math.cos(lat2*math.pi/180) * math.cos(lon2*math.pi/180- lon1*math.pi/180)) != 0:
         return r * math.acos(math.sin(lat1*math.pi/180) * math.sin(lat2*math.pi/180) + math.cos(lat1*math.pi/180) * math.cos(lat2*math.pi/180) * math.cos(lon2*math.pi/180- lon1*math.pi/180))
     return 1e-316#smallest float u can return in sypder
@@ -221,12 +223,14 @@ def read_bst(filename):
             elif i == ',':
                 pd.append(d)
                 d = ""
-            else:
+            elif i != '"':
                 d+=i
         o.append(pd)
-    print("read_bst,",time.process_time()-st)
+        print("read_bst,",time.process_time()-st)
+    return o
+    
 
-def intersect_point_lp(d, mSNR):#list of dict with SS_freq, SS_snr,SS_drift,id, time, band, rx_sign, rx_lat, rx_lon, rx_loc, tx_sign, tx_lat, tx_lon, tx_loc, distance, azimuth, rx_azimuth, *frequency, power, *snr, *drift, version, code
+def intersect_point_lp(d, mSNR, s, e, MR, ssT):#list of dict with SS_freq, SS_snr,SS_drift,id, time, band, rx_sign, rx_lat, rx_lon, rx_loc, tx_sign, tx_lat, tx_lon, tx_loc, distance, azimuth, rx_azimuth, *frequency, power, *snr, *drift, version, code
         
     st = time.process_time()    
     a = {}    
@@ -344,42 +348,47 @@ def intersect_point_lp(d, mSNR):#list of dict with SS_freq, SS_snr,SS_drift,id, 
                         p.append([point[2],point[3],j,k])
                         '''
 
-    print("intersect_point_lp,",time.process_time()-st)
-                
-    s = datetime.datetime(2024,9,1,0,0,0) #Y,M,D,h,m,s
-    e = datetime.datetime(2024,9,1,7,0,0)
-    MR = datetime.timedelta(minutes = 180)
-    ssT = 1
+    print("intersect_point_lp,",time.process_time()-st)        
     
-    query.print_json('all','a',s,e,p,MR,ssT)
+    query.print_json('all','p',s,e,p,MR,ssT)
     
     return p
 
-def crosscheck(d,p, lat1, lon1, lat2, lon2):#data, planes, minimum radius, area of focus
+def crosscheck(d,p, lat1, lon1, lat2, lon2, s, e):#data, planes, minimum radius, area of focus
     st = time.process_time()   
+    query.clear_json('all','d',s,e)
     mError = 0
+    mMin = int_MAX
+    mMax = 0
     numOfData = 0
+    dist = []
+    #print(p)
+    #print(len(d),len(p))
     for i in d:
         nearby = [int_MAX,[]]
-        for j in p:
-            #check if time and location is correct
-            #print(i[2].get('time')==j[0][0:4]+'-'+j[0][5:7]+'-'+j[0][8:10]+' '+j[1][0:2]+':'+j[1][3:5]+':00')
-            if i[2].get('time') == j[0][0:4]+'-'+j[0][5:7]+'-'+j[0][8:10]+' '+j[1][0:2]+':'+j[1][3:5]+':00' and i[0] > lat1 and i[0] < lat2 and i[1] > lon1 and i[1] < lat2:
-                #print(Dgc(R,i[0],i[1],int(j[9]),int(j[10])) < nearby[0])
-                if Dgc(R,i[0],i[1],int(j[9]),int(j[10])) <= nearby[0]:
-                    nearby=(Dgc(R,i[0],i[1],int(j[9]),int(j[10])),j)
-                    #print(nearby[0])
-        mError += nearby[0]
-        
-        numOfData += 1
+        #print(i[0],i[1])
+        if i[0] > lat1 and i[0] < lat2 and i[1] > lon1 and i[1] < lon2:
+            for j in p:    
+                #check if time and location is correct
+                if i[2].get('time') == j[0][0:4]+'-'+j[0][5:7]+'-'+j[0][8:10]+' '+j[1][0:2]+':'+j[1][3:5]+':00':
+                    
+                    if Dgc(R,i[0],i[1],float(j[9]),float(j[10])) <= nearby[0]:
+                        nearby=[Dgc(R,i[0],i[1],float(j[9]),float(j[10])),j]
+                        #print(nearby)
+            if len(nearby[1]) != 0:
+                mError += nearby[0]
+                if mMin > nearby[0]:
+                    mMin = nearby[0]
+                if mMax < nearby[0]:
+                    mMax = nearby[0]
+                numOfData += 1
+                query.append_json('all','d',s, e, nearby)
+                print(mError/numOfData, mMin, mMax, numOfData)
+    query.append_json('all','d',s, e, ']')    
     mError /= numOfData
-    #print(mError,numOfData,i[0],i[1],j[9],j[10],)
+    print(mError,numOfData,i[0],i[1],j[9],j[10],)
     print("crosscheck,",st)
-    return mError
-                
-                
-                    
-                    
+    return [mError,mMin,mMax,numOfData]
 
 if __name__ == "__main__":  
     d = [{'rx_lat': 1, 'tx_lat': 9},{'rx_lat': -7, 'tx_lat': 3},{'rx_lat': 3, 'tx_lat': 0}]

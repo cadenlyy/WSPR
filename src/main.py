@@ -11,14 +11,13 @@ import numpy as np
 import os
 import math
 
-'''
 #constants
 c = 299792458#m/s
 k = 1.38*10**-23#j/k
 t0 = 290#k
 B = 6
 R = 6378000#m radius of earth
-Hiono = 300000#m
+Hiono = 100000#m
 pheight = 20
 plength = 70
 pheading = 0
@@ -29,6 +28,7 @@ fSample = 12000
 N = tTransmittion * fSample #number of samples
 
 #checking for short path by plotting
+'''
 s = datetime.datetime(2022,11,1,15,0,0) #Y,M,D,h,m,s
 e = datetime.datetime(2022,11,1,23,59,0)
 #file path and naming
@@ -100,11 +100,11 @@ print(nos)
 '''
 
 #query details
-s = datetime.datetime(2022,11,1,0,0,0) #Y,M,D,h,m,s
-e = datetime.datetime(2022,11,1,23,59,0)
+s = datetime.datetime(2022,11,1,11,38,0) #Y,M,D,h,m,s
+e = datetime.datetime(2022,11,1,18,38,0)
 qf = 'pair'
-rx = 'KFS'
-tx = 'KG5QFD'
+rx = 'N6GN/K'
+tx = 'KD4EG'
 query.wspr_to_json(qf, s, e, rx, tx)
 #q = query.wsprlive_get('*','rx',s,e,rx,tx)
 
@@ -114,6 +114,7 @@ ssT = 1 #Minimum standard score
 pf = 'r'#r(read from json), t(test case), q(query from wsprnet)
 
 #check details
+#a = query.read_json('all','a',s,e,MR,ssT)
 a = process.anomalies_freqsnr(pf,MR,ssT,s,e,rx,tx)
 #process.print_csv(qf, 'a', s, e, MR, ssT, a, rx, tx)
 mSNR = -30#minimun SNR
@@ -121,19 +122,20 @@ clat1 = -60
 clon1 = 120
 clat2 = 0
 clon2 = 180
-#p = check.read_bst("1")
 
 #hypothesis testing
+'''
 v = []
 for i in a:
     v.append(i.get('snr'))
     
-d = plot_data.subtract_trend(v,100)
+d = plot_data.subtract_trend(v,50)
 plot_data.fit(d, 100, 100, rx, tx, s, e, 'sub')
 plot_data.fit(v, 100, 100, rx, tx, s, e, 'presub')
-
 '''
+
 #plot details
+'''
 mf = 'p'#a(all anomalies, takes in data from anomalies) i (intersecting lines and corresponding points, takes data from intersect_point) p(only points of intersection,  takes data from intersect_point) r(all spots)
 lat1 = -90#map lowest lat
 lon1 = -180#map lowest lon
@@ -144,19 +146,63 @@ c = "2024-09-01 03:00:00"#timestamp of plot
 p = check.intersect_point_lp(a,mSNR)#consider long path and check using SNR calculations
 '''
 
-'''
+
 #plot for multiple time stamps
+'''
 for m in range(0,60,2):
     if(m < 10):
         c = '2024-09-01 03:0'+str(m)+':00'
     else:
         c = '2024-09-01 03:'+str(m)+':00'
-    plot_planes.p(p,mf,c, MR, ssT, lat1, lon1, lat2, lon2)
+    plot_data.p(p,mf,c, MR, ssT, lat1, lon1, lat2, lon2)
     '''
 
-'''
+
 #cross check with flight data
-print(check.crosscheck(a,p,clat1,clon1,clat2,clon2))
+'''
+#points = check.intersect_point_lp(a,mSNR,s,e,MR,ssT)#consider long path and check using SNR calculations
+points = query.read_json('all','p',s,e,MR,ssT)
+p = check.read_bst("20241204_091202")
+#p = check.read_bst("1")
+print(check.crosscheck(points,p,clat1,clon1,clat2,clon2, s, e))
+'''
+
+#example of considering lp and sp
+'''
+plt.figure(figsize=(100,60))
+m = Basemap(projection='cyl',llcrnrlat=-90,urcrnrlat=90,
+            llcrnrlon=-180,urcrnrlon=180,resolution='c')
+    
+m.drawcoastlines(linewidth=5)
+    
+m.drawmeridians(np.arange(0,360,30))
+m.drawparallels(np.arange(-90,90,30))
+lon1 = [40,-40]
+lat1 = [20,0]
+
+plot_data.fulldrawgreatcircle([-180,180],lon1[0],lat1[0],lon1[1],lat1[1],m,linewidth = 10, c = 'b',zorder = 1)
+plot_data.fdrawgreatcircle([-180,180],lon1[0],lat1[0],lon1[1],lat1[1],m,linewidth = 10,zorder = 2)
+plt.plot(lon1[0], lat1[0], marker=".", markersize=50, c = 'green',zorder=3)
+plt.plot(lon1[1], lat1[1], marker=".", markersize=50, c = 'green',zorder=3)
+
+lon2 = [-30,60]
+lat2 = [-20,0]
+
+plot_data.fulldrawgreatcircle([-180,180],lon2[0],lat2[0],lon2[1],lat2[1],m,linewidth = 10, c = 'b',zorder = 1)
+plot_data.fdrawgreatcircle([-180,180],lon2[0],lat2[0],lon2[1],lat2[1],m,linewidth = 10,zorder = 2)
+plt.plot(lon2[0], lat2[0], marker=".", markersize=50, c = 'green',zorder=3)
+plt.plot(lon2[1], lat2[1], marker=".", markersize=50, c = 'green',zorder=3)
+
+points = check.intersect_greatcircle([lat1[0],lon1[0]],[lat1[1],lon1[1]],[lat2[0],lon2[0]],[lat2[1],lon2[1]])
+plt.plot(points[1], points[0], marker=".", markersize=50, c = 'black',zorder=4)
+plt.plot(points[3], points[2], marker=".", markersize=50, c = 'black',zorder=4)
+
+#plt.show()
+base_dir = "C:\\Users\\caden\\Documents\\code\\Real\\WSPR\\data\\plot"
+filename = "example of considering both lp and sp.png"
+abs_file = os.path.join(base_dir, filename)
+plt.title(filename, fontsize = 100)
+plt.savefig(abs_file, format="png", dpi=100)
 '''
 
 #query.wspr_to_json('all', s, e, MR, 'KL3RR', 'VE7AHT')
