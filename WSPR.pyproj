@@ -25,7 +25,7 @@
     <Compile Include="src\.ipynb_checkpoints\query-checkpoint.py" />
     <Compile Include="src\check.py" />
     <Compile Include="src\main.py" />
-    <Compile Include="src\plot_planes.py" />
+    <Compile Include="src\plot_data.py" />
     <Compile Include="src\process.py" />
     <Compile Include="src\test.py" />
     <Compile Include="src\query.py" />

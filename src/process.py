@@ -6,6 +6,8 @@ import csv
 import os
 import time
 
+def dBToPower(x):
+    return pow(10,x/10)
 
 def roundEvenDateTime(a): #YYYY-MM-DD HH:MM:SS
     return datetime.datetime.strptime(str(a)[:15]+str(int(str(a)[15])%2+int(str(a)[15]))+str(a)[16:], '%Y-%m-%d %H:%M:%S')
@@ -27,7 +29,7 @@ def print_csv(tstations, tdata, ts, te, MR, ssT, data, rx = None, tx = None):#ou
     #csv file naming convention
     #typestations_typedata_rx_tx_starttime_endtime_MR,ssT
     #typestations: all(all stations) pair(one pair of stations)
-    #typedata: t(all transmited and processed data) a(all anomalous transmition data no processing data)
+    #typedata: t(all transmited and processed data) a(all anomalous transmition data no processing data) dist(distance between closes plane to point)
     st = time.process_time()    
     #check or one pair or multiple    
     if rx == None:
@@ -88,6 +90,7 @@ def anomalies_snr(f, MR, ssT, ts, te, rx = None, tx = None):
     
     for i in q: #proccess each spot
         data = list(i.values())
+        data[16] = dBToPower(data[16])
         #adding new receving stations
         if transmitions.get(tuple(data[3:7])) == None: 
             transmitions.update({tuple(data[3:7]): {}})
@@ -105,6 +108,7 @@ def anomalies_snr(f, MR, ssT, ts, te, rx = None, tx = None):
     
         #calculating sum for freq^2, SNR^2 and drift^2
         transmitions.get(tuple(data[3:7])).get(tuple(data[7:11])).get(data[1])[1][1]+=data[16]**2
+        
 
     #sliding(only actually going through each spot once so still O(N))   
     for r in transmitions.items():# receivers
@@ -208,6 +212,7 @@ def anomalies_all(f, MR, ssT, ts, te, rx = None, tx = None):
     
     for i in q: #proccess each spot
         data = list(i.values())
+        data[16] = dBToPower(data[16])
         #adding new receving stations
         if transmitions.get(tuple(data[3:7])) == None: 
             transmitions.update({tuple(data[3:7]): {}})
@@ -353,6 +358,7 @@ def anomalies_freqsnr(f, MR, ssT, ts, te, rx = None, tx = None):
     
     for i in q: #proccess each spot
         data = list(i.values())
+        data[16] = dBToPower(data[16])
         #adding new receving stations
         if transmitions.get(tuple(data[3:7])) == None: 
             transmitions.update({tuple(data[3:7]): {}})
@@ -459,23 +465,25 @@ def anomalies_freqsnr(f, MR, ssT, ts, te, rx = None, tx = None):
     d = sorted(d, key = lambda k: k.get('time'))
     #print_csv('allb','t',ts,te,MR,ssT,d)                    
     #print_csv('all','a',ts,te,MR,ssT,a)
-    print_csv('pair','t', ts, te, MR, ssT, sorted(d, key=lambda k: k['time']), rx, tx)
+    #print_csv('pair','t', ts, te, MR, ssT, sorted(d, key=lambda k: k['time']), rx, tx)
     #print_csv('pair','a',ts,te,MR,ssT,a,rx,tx)
     
     #print(transmitions)
     print("anomalies_freqsnr,",time.process_time()-st)#checking code speed
     
-    return a
+    #query.print_json(f,'t',ts,te,d,MR,ssT,rx,tx)
+    
+    return d
 
 if __name__ == "__main__":
     #process details
-    s = datetime.datetime(2024,9,1,0,0,0) #Y,M,D,h,m,s
-    e = datetime.datetime(2024,9,1,7,0,0)
-    MR = datetime.timedelta(minutes = 180)
+    s = datetime.datetime(2024,7,24,9,26,0) #Y,M,D,h,m,s
+    e = datetime.datetime(2024,7,24,9,30,0)
+    MR = datetime.timedelta(minutes = 2)
     ssT = 1
     
     #pair_KL3RR_WF1A_2024-09-01_00-00-00_2024-09-03_23-59-59_3-00-00
-    anomalies_freqsnr('r', MR, ssT, s, e)    
+    print(anomalies_snr('t', MR, ssT, s, e))
     
     #one_pair(MR, datetime.datetime(2024,7,24,9,26,0), datetime.datetime(2024,7,24,9,30,0), 'KJ6MKI', 'W6LPM')
     #all_spots(MR, s, e)

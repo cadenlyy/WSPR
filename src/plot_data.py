@@ -186,7 +186,7 @@ def subtract_trend(v,r):#takes in data that is sorted by time
     
         
     
-def fit(v,b,gs,rx,tx,s,e,n=None):
+def fit(v,b,gs,s,e,rx = None,tx = None,n=None):
     fig = plt.figure(figsize=(100,60))
     counts, bins, patches = plt.hist(v,bins = b)
 
@@ -197,13 +197,30 @@ def fit(v,b,gs,rx,tx,s,e,n=None):
     x_values_to_fit = np.linspace(min(v),max(v),gs)
     
     # fit the data and plot the result
-    param, cov = scipy.optimize.curve_fit(gaussian, bins, counts)
+    param, cov = scipy.optimize.curve_fit(gaussian, bins, counts, maxfev = 500000)
     
     plt.plot(x_values_to_fit, gaussian(x_values_to_fit, *param),linewidth = 10)
     plt.xticks(fontsize = 100) 
     plt.yticks(fontsize = 100) 
+
+    if rx == None:
+        frx = ''
+    else:
+        frx = ''
+        for i in rx:
+            if i != '/' and i != '\\':
+                frx+=i
+        frx += '_'
+    if tx == None:
+        ftx = ''
+    else:
+        ftx = ''
+        for i in tx:
+            if i != '/' and i != '\\':
+                ftx+=i
+        ftx += '_'
     
-    filename = rx+'_'+tx+'_'+s.strftime("%Y-%m-%d_%H-%M-%S")+'_'+e.strftime("%Y-%m-%d_%H-%M-%S")+'_'+str(b)+'_'+n
+    filename = frx+ftx+s.strftime("%Y-%m-%d_%H-%M-%S")+'_'+e.strftime("%Y-%m-%d_%H-%M-%S")+'_'+str(b)+'_'+n
     plt.title(filename, fontsize = 100)
     base_dir = "C:\\Users\\caden\\Documents\\code\\Real\\WSPR\\data\\plot"
     abs_file = os.path.join(base_dir, filename)

@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 import math
+import temp
 
 #constants
 c = 299792458#m/s
@@ -25,7 +26,7 @@ SPN = 4.9406564584124654e-324
 int_MAX = 2**63-1
 tTransmittion = 110.6#S transmittion time 
 fSample = 12000
-N = tTransmittion * fSample #number of samples
+N = 30 #number of samples
 
 #checking for short path by plotting
 '''
@@ -100,39 +101,28 @@ print(nos)
 '''
 
 #query details
-s = datetime.datetime(2022,11,1,11,38,0) #Y,M,D,h,m,s
-e = datetime.datetime(2022,11,1,18,38,0)
+s = datetime.datetime(2022,11,1,0,0,0) #Y,M,D,h,m,s
+e = datetime.datetime(2022,11,1,23,59,0)
 qf = 'pair'
-rx = 'N6GN/K'
-tx = 'KD4EG'
-query.wspr_to_json(qf, s, e, rx, tx)
+rx = 'KFS'
+tx = 'KG5QFD'
+#query.wspr_to_json(qf, s, e)
 #q = query.wsprlive_get('*','rx',s,e,rx,tx)
 
 #processing details
 MR = datetime.timedelta(minutes = 180)
-ssT = 1 #Minimum standard score
+ssT = 0.5 #Minimum standard score
 pf = 'r'#r(read from json), t(test case), q(query from wsprnet)
 
 #check details
 #a = query.read_json('all','a',s,e,MR,ssT)
 a = process.anomalies_freqsnr(pf,MR,ssT,s,e,rx,tx)
 #process.print_csv(qf, 'a', s, e, MR, ssT, a, rx, tx)
-mSNR = -30#minimun SNR
+mSNR = -30 #minimun SNR in dB
 clat1 = -60
 clon1 = 120
 clat2 = 0
 clon2 = 180
-
-#hypothesis testing
-'''
-v = []
-for i in a:
-    v.append(i.get('snr'))
-    
-d = plot_data.subtract_trend(v,50)
-plot_data.fit(d, 100, 100, rx, tx, s, e, 'sub')
-plot_data.fit(v, 100, 100, rx, tx, s, e, 'presub')
-'''
 
 #plot details
 '''
@@ -142,14 +132,13 @@ lon1 = -180#map lowest lon
 lat2 = 90#map highest lat
 lon2 = 180#map highest lon
 c = "2024-09-01 03:00:00"#timestamp of plot
-#p = check.intersect_point_sp(a)#short path calculations only
-p = check.intersect_point_lp(a,mSNR)#consider long path and check using SNR calculations
+#p = check.intersect_point_sp(a,s,e,MR,ssT)#short path calculations only
+p = check.intersect_point_lp(a,mSNR,s,e,MR,ssT)#consider long path and check using SNR calculations
 '''
-
 
 #plot for multiple time stamps
 '''
-for m in range(0,60,2):
+for m in range(0,60,2):    
     if(m < 10):
         c = '2024-09-01 03:0'+str(m)+':00'
     else:
@@ -157,6 +146,29 @@ for m in range(0,60,2):
     plot_data.p(p,mf,c, MR, ssT, lat1, lon1, lat2, lon2)
     '''
 
+#histogram for SNR
+v = []
+for i in a:
+    if abs(i.get('snr')) < 0.5:     
+        v.append(i.get('snr'))
+
+d = plot_data.subtract_trend(v,50)
+plot_data.fit(d, 100, 100, s, e, rx, tx, n = 'sub')
+#plot_data.fit(v, 100, 100, s, e, rx, tx, n = 'presub')
+
+#histogram for distance
+'''
+a = temp.d
+v = []
+for i in a:
+    v.append({'distance':i[0]})
+    
+process.print_csv('all','dist',s,e,MR,ssT,v)
+
+#d = plot_data.subtract_trend(v,50)
+#plot_data.fit(d, 100, 100, s, e, n = 'sub')
+#plot_data.fit(v, 100, 100, s, e, n = 'dist')
+'''
 
 #cross check with flight data
 '''
@@ -172,12 +184,13 @@ print(check.crosscheck(points,p,clat1,clon1,clat2,clon2, s, e))
 plt.figure(figsize=(100,60))
 m = Basemap(projection='cyl',llcrnrlat=-90,urcrnrlat=90,
             llcrnrlon=-180,urcrnrlon=180,resolution='c')
-    
+
 m.drawcoastlines(linewidth=5)
     
 m.drawmeridians(np.arange(0,360,30))
 m.drawparallels(np.arange(-90,90,30))
-lon1 = [40,-40]
+
+lon1 = [-80,-40]
 lat1 = [20,0]
 
 plot_data.fulldrawgreatcircle([-180,180],lon1[0],lat1[0],lon1[1],lat1[1],m,linewidth = 10, c = 'b',zorder = 1)
@@ -185,8 +198,8 @@ plot_data.fdrawgreatcircle([-180,180],lon1[0],lat1[0],lon1[1],lat1[1],m,linewidt
 plt.plot(lon1[0], lat1[0], marker=".", markersize=50, c = 'green',zorder=3)
 plt.plot(lon1[1], lat1[1], marker=".", markersize=50, c = 'green',zorder=3)
 
-lon2 = [-30,60]
-lat2 = [-20,0]
+lon2 = [-60,-30]
+lat2 = [-20,25]
 
 plot_data.fulldrawgreatcircle([-180,180],lon2[0],lat2[0],lon2[1],lat2[1],m,linewidth = 10, c = 'b',zorder = 1)
 plot_data.fdrawgreatcircle([-180,180],lon2[0],lat2[0],lon2[1],lat2[1],m,linewidth = 10,zorder = 2)
@@ -203,6 +216,15 @@ filename = "example of considering both lp and sp.png"
 abs_file = os.path.join(base_dir, filename)
 plt.title(filename, fontsize = 100)
 plt.savefig(abs_file, format="png", dpi=100)
+'''
+
+#calulating number of points
+'''
+nop = 0
+for i in p:
+    if i[2].get('time') == "2024-09-01 03:32:00":
+        nop += 1
+print(nop)
 '''
 
 #query.wspr_to_json('all', s, e, MR, 'KL3RR', 'VE7AHT')
