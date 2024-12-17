@@ -9,6 +9,7 @@ import process
 import query
 import os
 import scipy
+import constants
 
 class plane: #maintain the necessary details for each plane
     lat = 0
@@ -143,7 +144,7 @@ def p(t,f,c,MR,ssT,lat1,lon1,lat2,lon2):#draw map and all plots
                 
     
     #saving plot as img
-    base_dir = "C:\\Users\\caden\\Documents\\code\\Real\\WSPR\\data\\plot"
+    base_dir = constants.dir+"data\\plot"
     filename = f+'_'+c[0:10]+'_'+c[11:13]+'-'+c[14:16]+'-'+c[17:19]+'_'+str(MR).split(':')[0]+'-'+str(MR).split(':')[1]+'-'+str(MR).split(':')[2]+'_'+str(ssT)+str(lat1)+'_'+str(lon1)+'_'+str(lat2)+'_'+str(lon2)+'.png' #type_rx_tx_ts_te_MR.txt
     abs_file = os.path.join(base_dir, filename)
     plt.title(filename, fontsize = 100)
@@ -222,7 +223,7 @@ def fit(v,b,gs,s,e,rx = None,tx = None,n=None):
     
     filename = frx+ftx+s.strftime("%Y-%m-%d_%H-%M-%S")+'_'+e.strftime("%Y-%m-%d_%H-%M-%S")+'_'+str(b)+'_'+n
     plt.title(filename, fontsize = 100)
-    base_dir = "C:\\Users\\caden\\Documents\\code\\Real\\WSPR\\data\\plot"
+    base_dir = constants.dir+"data\\plot"
     abs_file = os.path.join(base_dir, filename)
     plt.savefig(abs_file)
     #plt.show()

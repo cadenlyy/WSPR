@@ -4,6 +4,7 @@ import time
 import os
 import datetime
 import process
+import constants
 
 #   name             type
 #|id        |UInt64                |The unique spot id (same id as used by wsprnet.org)
@@ -74,7 +75,7 @@ def print_json(tstation, tdata, ts, te, data, MR = None, ssT = None, rx = None, 
             if i != '/' and i != '\\':
                 ftx+=i
     #file path and naming
-    base_dir = "C:\\Users\\caden\\Documents\\code\\Real\\WSPR\\data\\json"
+    base_dir = constants.dir+"data\\json"
     filename = tstation+"_"+tdata+frx+ftx+'_'+ts.strftime("%Y-%m-%d_%H-%M-%S")+'_'+te.strftime("%Y-%m-%d_%H-%M-%S") #type_rx_tx_ts_te_MR_ssT.txt
     if tdata != 'r' and tdata != 'd':
         filename += '_'+str(MR).split(':')[0]+'-'+str(MR).split(':')[1]+'-'+str(MR).split(':')[2]+'_'+str(ssT)
@@ -106,7 +107,7 @@ def clear_json(tstation, tdata, ts, te, MR = None, ssT = None, rx = None, tx = N
             if i != '/' and i != '\\':
                 ftx+=i
     #file path and naming
-    base_dir = "C:\\Users\\caden\\Documents\\code\\Real\\WSPR\\data\\json"
+    base_dir = constants.dir+"data\\json"
     filename = tstation+"_"+tdata+frx+ftx+'_'+ts.strftime("%Y-%m-%d_%H-%M-%S")+'_'+te.strftime("%Y-%m-%d_%H-%M-%S") #type_rx_tx_ts_te_MR_ssT.txt
     if tdata != 'r' and tdata != 'd':
         filename += '_'+str(MR).split(':')[0]+'-'+str(MR).split(':')[1]+'-'+str(MR).split(':')[2]+'_'+str(ssT)
@@ -138,7 +139,7 @@ def append_json(tstation, tdata, ts, te, data, MR = None, ssT = None, rx = None,
             if i != '/' and i != '\\':
                 ftx+=i
     #file path and naming
-    base_dir = "C:\\Users\\caden\\Documents\\code\\Real\\WSPR\\data\\json"
+    base_dir = constants.dir+"data\\json"
     filename = tstation+"_"+tdata+frx+ftx+'_'+ts.strftime("%Y-%m-%d_%H-%M-%S")+'_'+te.strftime("%Y-%m-%d_%H-%M-%S") #type_rx_tx_ts_te_MR_ssT.txt
     if tdata != 'r' and tdata != 'd':
         filename += '_'+str(MR).split(':')[0]+'-'+str(MR).split(':')[1]+'-'+str(MR).split(':')[2]+'_'+str(ssT)
@@ -172,7 +173,7 @@ def read_json(tstation, tdata, ts, te, MR = None, ssT = None, rx = None, tx = No
             if i != '/' and i != '\\':
                 ftx+=i
     #file path and naming
-    base_dir = 'C:\\Users\\caden\\Documents\\code\\Real\\WSPR\\data\\json'
+    base_dir = constants.dir+'data\\json'
     filename = tstation+"_"+tdata+frx+ftx+'_'+ts.strftime("%Y-%m-%d_%H-%M-%S")+'_'+te.strftime("%Y-%m-%d_%H-%M-%S") #type_rx_tx_ts_te_MR_ssT.txt
     if tdata != 'r' and tdata != 'd':
         filename += '_'+str(MR).split(':')[0]+'-'+str(MR).split(':')[1]+'-'+str(MR).split(':')[2]+'_'+str(ssT)

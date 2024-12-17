@@ -5,6 +5,7 @@ import math
 import csv
 import os
 import time
+import constants
 
 def dBToPower(x):
     return pow(10,x/10)
@@ -47,7 +48,7 @@ def print_csv(tstations, tdata, ts, te, MR, ssT, data, rx = None, tx = None):#ou
             if i != '/' and i != '\\':
                 ftx+=i
     #file path and nameing
-    base_dir = "C:\\Users\\caden\\Documents\\code\\Real\\WSPR\\data\\csv"
+    base_dir = constants.dir+"data\\csv"
     filename = tstations+'_'+tdata+frx+ftx+'_'+ts.strftime("%Y-%m-%d_%H-%M-%S")+'_'+te.strftime("%Y-%m-%d_%H-%M-%S")+'_'+str(MR).split(':')[0]+'-'+str(MR).split(':')[1]+'-'+str(MR).split(':')[2]+'_'+str(ssT)+'.csv' #type_rx_tx_ts_te_MR.csv
     abs_file = os.path.join(base_dir, filename)
     if len(data) != 0:

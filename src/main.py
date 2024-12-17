@@ -10,23 +10,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 import math
-import temp
-
-#constants
-c = 299792458#m/s
-k = 1.38*10**-23#j/k
-t0 = 290#k
-B = 6
-R = 6378000#m radius of earth
-Hiono = 100000#m
-pheight = 20
-plength = 70
-pheading = 0
-SPN = 4.9406564584124654e-324
-int_MAX = 2**63-1
-tTransmittion = 110.6#S transmittion time 
-fSample = 12000
-N = 30 #number of samples
+#import temp
+import constants
 
 #checking for short path by plotting
 '''
@@ -57,9 +42,9 @@ for i in range(len(data)):
             rx = ''
             continue
 
-        Dgctotal11 = 2 * math.pi * R - check.Dgc(R,q[0].get('rx_lat'),q[0].get('rx_lon'),q[0].get('tx_lat'),q[0].get('tx_lon'))
-        N11 = math.ceil(Dgctotal11/(2*R*math.acos(R/(R+300000))))
-        lpd = check.Dhtotal(Dgctotal11, N11, Hiono)
+        Dgctotal11 = 2 * math.pi * constants.R - check.Dgc(constants.R,q[0].get('rx_lat'),q[0].get('rx_lon'),q[0].get('tx_lat'),q[0].get('tx_lon'))
+        N11 = math.ceil(Dgctotal11/(2*R*math.acos(constants.R/(constants.R+300000))))
+        lpd = check.Dhtotal(Dgctotal11, N11, constants.Hiono)
         
         lpsnr = check.SNR(q[0].get('power'),q[0].get('frequency'),1,lpd,1,N11)
         #print(lpsnr,Dgctotal11,N11,lpd)
@@ -106,7 +91,7 @@ e = datetime.datetime(2022,11,1,23,59,0)
 qf = 'pair'
 rx = 'KFS'
 tx = 'KG5QFD'
-#query.wspr_to_json(qf, s, e)
+query.wspr_to_json(qf, s, e, rx, tx)
 #q = query.wsprlive_get('*','rx',s,e,rx,tx)
 
 #processing details
@@ -148,9 +133,8 @@ for m in range(0,60,2):
 
 #histogram for SNR
 v = []
-for i in a:
-    if abs(i.get('snr')) < 0.5:     
-        v.append(i.get('snr'))
+for i in a:     
+    v.append(i.get('snr'))
 
 d = plot_data.subtract_trend(v,50)
 plot_data.fit(d, 100, 100, s, e, rx, tx, n = 'sub')
