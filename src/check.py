@@ -99,9 +99,11 @@ def RCS(h,l,ra,f):
     return 4 * math.pi * h**2 * l**2 * math.sin(ra)**2 * f**2 / constants.c**2
 
 def Dgc(r,lat1,lon1,lat2,lon2):#greatcircle distance between 2 points
-    #print(r,lat1,lon1,lat2,lon2)
-    if r * math.acos(math.sin(lat1*math.pi/180) * math.sin(lat2*math.pi/180) + math.cos(lat1*math.pi/180) * math.cos(lat2*math.pi/180) * math.cos(lon2*math.pi/180- lon1*math.pi/180)) != 0:
-        return r * math.acos(math.sin(lat1*math.pi/180) * math.sin(lat2*math.pi/180) + math.cos(lat1*math.pi/180) * math.cos(lat2*math.pi/180) * math.cos(lon2*math.pi/180- lon1*math.pi/180))
+    print(r,lat1,lon1,lat2,lon2)
+    if not math.isnan(lat1):
+        if int(lat1) == int(lat2) or int(lon1) == int(lon2):
+            if r * math.acos(math.sin(lat1*math.pi/180) * math.sin(lat2*math.pi/180) + math.cos(lat1*math.pi/180) * math.cos(lat2*math.pi/180) * math.cos(lon2*math.pi/180- lon1*math.pi/180)) != 0:
+                return r * math.acos(math.sin(lat1*math.pi/180) * math.sin(lat2*math.pi/180) + math.cos(lat1*math.pi/180) * math.cos(lat2*math.pi/180) * math.cos(lon2*math.pi/180- lon1*math.pi/180))
     return 1e-316#smallest float u can return in sypder
 
 def Dhtotal(Dgctotal,n,h,r):
@@ -216,9 +218,8 @@ def read_bst(filename):
     
 
 def intersect_point_lp(d, mSNR, s, e, MR, ssT):#list of dict with SS_freq, SS_snr,SS_drift,id, time, band, rx_sign, rx_lat, rx_lon, rx_loc, tx_sign, tx_lat, tx_lon, tx_loc, distance, azimuth, rx_azimuth, *frequency, power, *snr, *drift, version, code
-        
     st = time.process_time()    
-    a = {}    
+    a = {}
     #arranging by time
     for i in d:
         #adding new times
@@ -226,8 +227,6 @@ def intersect_point_lp(d, mSNR, s, e, MR, ssT):#list of dict with SS_freq, SS_sn
             a.update({i.get('time'): []})
         a.get(i.get('time')).append(i)
     
-    #O(N^2) but DP
-    '''mem = {}'''
     p = []
     for i in a.keys():#time
         #prevent comparing with prev spot
@@ -255,13 +254,13 @@ def intersect_point_lp(d, mSNR, s, e, MR, ssT):#list of dict with SS_freq, SS_sn
                     N11 = math.ceil(Dgctotal11/(2*constants.R*math.acos(constants.R/(constants.R+300000))))
                     #ensuring distance from rx to target is the correct 1
                     if shortest_hdist(point[1], s1.get('tx_lon'), [-180, 180]) > abs(s1.get('rx_lon')-s1.get('tx_lon')) and shortest_hdist(point[1], s1.get('tx_lon'), [-180, 180]) > abs(s1.get('rx_lon')-point[1]):
-                        Rrx11 = (Dgc(constants.R,point[0],point[1],s1.get('rx_lat'),s1.get('rx_lon'))/Dgctotal11)*Dhtotal(Dgctotal11, N11, constants.constants.Hiono, constants.R)
+                        Rrx11 = (Dgc(constants.R,point[0],point[1],s1.get('rx_lat'),s1.get('rx_lon'))/Dgctotal11)*Dhtotal(Dgctotal11, N11, constants.Hiono, constants.R)
                     else:
-                        Rrx11 = ((2 * math.pi * constants.R - Dgc(constants.R,point[0],point[1],s1.get('rx_lat'),s1.get('rx_lon')))/Dgctotal11)*Dhtotal(Dgctotal11, N11, constants.constants.Hiono, constants.R)
+                        Rrx11 = ((2 * math.pi * constants.R - Dgc(constants.R,point[0],point[1],s1.get('rx_lat'),s1.get('rx_lon')))/Dgctotal11)*Dhtotal(Dgctotal11, N11, constants.Hiono, constants.R)
                     if shortest_hdist(point[1], s1.get('rx_lon'), [-180, 180]) > abs(s1.get('tx_lon')-s1.get('rx_lon')) and shortest_hdist(point[1], s1.get('rx_lon'), [-180, 180]) > abs(s1.get('tx_lon')-point[1]):
-                        Rtx11 = (Dgc(constants.R,point[0],point[1],s1.get('tx_lat'),s1.get('tx_lon'))/Dgctotal11)*Dhtotal(Dgctotal11, N11, constants.constants.Hiono, constants.R)
+                        Rtx11 = (Dgc(constants.R,point[0],point[1],s1.get('tx_lat'),s1.get('tx_lon'))/Dgctotal11)*Dhtotal(Dgctotal11, N11, constants.Hiono, constants.R)
                     else:
-                        Rtx11 = ((2 * math.pi * constants.R - Dgc(constants.R,point[0],point[1],s1.get('tx_lat'),s1.get('tx_lon')))/Dgctotal11)*Dhtotal(Dgctotal11, N11, constants.constants.Hiono, constants.R)
+                        Rtx11 = ((2 * math.pi * constants.R - Dgc(constants.R,point[0],point[1],s1.get('tx_lat'),s1.get('tx_lon')))/Dgctotal11)*Dhtotal(Dgctotal11, N11, constants.Hiono, constants.R)
                     SNR11 = SNR(s1.get('power'),s1.get('frequency'),rcs1,Rrx11,Rtx11,N11)
                     #print('11',SNR11)
                     if SNR11 > mSNR:
@@ -274,13 +273,13 @@ def intersect_point_lp(d, mSNR, s, e, MR, ssT):#list of dict with SS_freq, SS_sn
                         N12 = math.ceil(Dgctotal12/(2*constants.R*math.acos(constants.R/(constants.R+300000))))
                         #ensuring distance from rx to target is the correct 1
                         if shortest_hdist(point[1], s2.get('tx_lon'), [-180, 180]) > abs(s2.get('rx_lon')-s2.get('tx_lon')) and shortest_hdist(point[1], s2.get('tx_lon'), [-180, 180]) > abs(s2.get('rx_lon')-point[1]):
-                            Rrx12 = (Dgc(constants.R,point[0],point[1],s2.get('rx_lat'),s2.get('rx_lon'))/Dgctotal12)*Dhtotal(Dgctotal12, N12, constants.constants.Hiono, constants.R)
+                            Rrx12 = (Dgc(constants.R,point[0],point[1],s2.get('rx_lat'),s2.get('rx_lon'))/Dgctotal12)*Dhtotal(Dgctotal12, N12, constants.Hiono, constants.R)
                         else:
-                            Rrx12 = ((2 * math.pi * constants.R - Dgc(constants.R,point[0],point[1],s2.get('rx_lat'),s2.get('rx_lon')))/Dgctotal12)*Dhtotal(Dgctotal12, N12, constants.constants.Hiono, constants.R)
+                            Rrx12 = ((2 * math.pi * constants.R - Dgc(constants.R,point[0],point[1],s2.get('rx_lat'),s2.get('rx_lon')))/Dgctotal12)*Dhtotal(Dgctotal12, N12, constants.Hiono, constants.R)
                         if shortest_hdist(point[1], s2.get('rx_lon'), [-180, 180]) > abs(s2.get('tx_lon')-s2.get('rx_lon')) and shortest_hdist(point[1], s2.get('rx_lon'), [-180, 180]) > abs(s2.get('tx_lon')-point[1]):
-                            Rtx12 = (Dgc(constants.R,point[0],point[1],s2.get('tx_lat'),s2.get('tx_lon'))/Dgctotal12)*Dhtotal(Dgctotal12, N12, constants.constants.Hiono, constants.R)
+                            Rtx12 = (Dgc(constants.R,point[0],point[1],s2.get('tx_lat'),s2.get('tx_lon'))/Dgctotal12)*Dhtotal(Dgctotal12, N12, constants.Hiono, constants.R)
                         else:
-                            Rtx12 = ((2 * math.pi * constants.R - Dgc(constants.R,point[0],point[1],s2.get('tx_lat'),s2.get('tx_lon')))/Dgctotal12)*Dhtotal(Dgctotal12, N12, constants.constants.Hiono, constants.R)
+                            Rtx12 = ((2 * math.pi * constants.R - Dgc(constants.R,point[0],point[1],s2.get('tx_lat'),s2.get('tx_lon')))/Dgctotal12)*Dhtotal(Dgctotal12, N12, constants.Hiono, constants.R)
                         SNR12 = SNR(s2.get('power'),s2.get('frequency'),rcs2,Rrx12,Rtx12,N12)
                         #print('12',SNR12)
                         if SNR12 > mSNR:

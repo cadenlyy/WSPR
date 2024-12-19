@@ -86,11 +86,11 @@ print(nos)
 '''
 
 #query details
-s = datetime.datetime(2022,11,1,0,0,0) #Y,M,D,h,m,s
-e = datetime.datetime(2022,11,1,23,59,0)
+s = datetime.datetime(2022,10,31,0,0,0) #Y,M,D,h,m,s
+e = datetime.datetime(2022,11,1,15,44,0)
 qf = 'pair'
-rx = 'KFS'
-tx = 'KG5QFD'
+rx = 'VK6WR'
+tx = 'S77HQ'
 query.wspr_to_json(qf, s, e, rx, tx)
 #q = query.wsprlive_get('*','rx',s,e,rx,tx)
 
@@ -109,8 +109,8 @@ clon1 = 120
 clat2 = 0
 clon2 = 180
 
+
 #plot details
-'''
 mf = 'p'#a(all anomalies, takes in data from anomalies) i (intersecting lines and corresponding points, takes data from intersect_point) p(only points of intersection,  takes data from intersect_point) r(all spots)
 lat1 = -90#map lowest lat
 lon1 = -180#map lowest lon
@@ -119,7 +119,6 @@ lon2 = 180#map highest lon
 c = "2024-09-01 03:00:00"#timestamp of plot
 #p = check.intersect_point_sp(a,s,e,MR,ssT)#short path calculations only
 p = check.intersect_point_lp(a,mSNR,s,e,MR,ssT)#consider long path and check using SNR calculations
-'''
 
 #plot for multiple time stamps
 '''
@@ -132,6 +131,7 @@ for m in range(0,60,2):
     '''
 
 #histogram for SNR
+'''
 v = []
 for i in a:     
     v.append(i.get('snr'))
@@ -139,6 +139,7 @@ for i in a:
 d = plot_data.subtract_trend(v,50)
 plot_data.fit(d, 100, 100, s, e, rx, tx, n = 'sub')
 #plot_data.fit(v, 100, 100, s, e, rx, tx, n = 'presub')
+'''
 
 #histogram for distance
 '''
@@ -157,7 +158,7 @@ process.print_csv('all','dist',s,e,MR,ssT,v)
 #cross check with flight data
 '''
 #points = check.intersect_point_lp(a,mSNR,s,e,MR,ssT)#consider long path and check using SNR calculations
-points = query.read_json('all','p',s,e,MR,ssT)
+points = query.read_json('all','plp',s,e,MR,ssT)
 p = check.read_bst("20241204_091202")
 #p = check.read_bst("1")
 print(check.crosscheck(points,p,clat1,clon1,clat2,clon2, s, e))

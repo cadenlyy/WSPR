@@ -220,10 +220,10 @@ def anomalies_all(f, MR, ssT, ts, te, rx = None, tx = None):
         #adding new transmitting stations to receivers
         if transmitions.get(tuple(data[3:7])).get(tuple(data[7:11])) == None:
             transmitions.get(tuple(data[3:7])).update({tuple(data[7:11]):{}})
-        #adding new time
+        #adding new bands
         if transmitions.get(tuple(data[3:7])).get(tuple(data[7:11])).get(data[2]) == None:
             transmitions.get(tuple(data[3:7])).get(tuple(data[7:11])).update({data[2]:{}})
-        #adding new band
+        #adding new time
         if transmitions.get(tuple(data[3:7])).get(tuple(data[7:11])).get(data[2]).get(data[1]) == None:
             transmitions.get(tuple(data[3:7])).get(tuple(data[7:11])).get(data[2]).update({data[1]:[[],[0,0,0,0,0,0,None,None,None,None,None,None,None,[None,None,None,None,None,None]]]}) #[sum:freq,snr,drift,sum:freq^2,snr^2,drift^2,mean:freq,snr,drift,SD:freq,snr,drift,numOfSpots,sliding window]
         #pushing in transmittion info                                    
@@ -366,10 +366,10 @@ def anomalies_freqsnr(f, MR, ssT, ts, te, rx = None, tx = None):
         #adding new transmitting stations to receivers
         if transmitions.get(tuple(data[3:7])).get(tuple(data[7:11])) == None:
             transmitions.get(tuple(data[3:7])).update({tuple(data[7:11]):{}})
-        #adding new time
+        #adding new bands
         if transmitions.get(tuple(data[3:7])).get(tuple(data[7:11])).get(data[2]) == None:
             transmitions.get(tuple(data[3:7])).get(tuple(data[7:11])).update({data[2]:{}})
-        #adding new bands
+        #adding new time
         if transmitions.get(tuple(data[3:7])).get(tuple(data[7:11])).get(data[2]).get(data[1]) == None:
             transmitions.get(tuple(data[3:7])).get(tuple(data[7:11])).get(data[2]).update({data[1]:[[],[0,0,0,0,None,None,None,None,None,[None,None,None,None]]]}) #[sum:freq,snr,sum:freq^2,snr^2,mean:freq,snr,SD:freq,snr,numOfSpots,sliding window]
         #pushing in transmittion info                                    
@@ -392,7 +392,7 @@ def anomalies_freqsnr(f, MR, ssT, ts, te, rx = None, tx = None):
                 right = 0
                 ft = list(t[1])[0]#time of first spot
                 lt = list(t[1])[-1]#time of last spot
-                slidingWindow = [0,0,0,0,0,0]#sum:freq,snr,drift,sum:freq^2,snr^2,drift^2
+                slidingWindow = [0,0,0,0]#sum:freq,snr,sum:freq^2,snr^2
                 for i in range(0, len(t[1])):#time
                     #adding still MR away from start time
                     if datetime.datetime.strptime(list(t[1])[i], '%Y-%m-%d %H:%M:%S') - datetime.datetime.strptime(ft, '%Y-%m-%d %H:%M:%S') < MR:                 
@@ -466,7 +466,7 @@ def anomalies_freqsnr(f, MR, ssT, ts, te, rx = None, tx = None):
     d = sorted(d, key = lambda k: k.get('time'))
     #print_csv('allb','t',ts,te,MR,ssT,d)                    
     #print_csv('all','a',ts,te,MR,ssT,a)
-    #print_csv('pair','t', ts, te, MR, ssT, sorted(d, key=lambda k: k['time']), rx, tx)
+    print_csv('pair','t', ts, te, MR, ssT, sorted(d, key=lambda k: k['time']), rx, tx)
     #print_csv('pair','a',ts,te,MR,ssT,a,rx,tx)
     
     #print(transmitions)
@@ -474,7 +474,7 @@ def anomalies_freqsnr(f, MR, ssT, ts, te, rx = None, tx = None):
     
     #query.print_json(f,'t',ts,te,d,MR,ssT,rx,tx)
     
-    return d
+    return a
 
 if __name__ == "__main__":
     #process details

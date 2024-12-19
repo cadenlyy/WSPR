@@ -13,4 +13,4 @@ int_MAX = 2**63-1
 tTransmittion = 110.6#S transmittion time 
 fSample = 12000
 N = 30 #number of samples
-dir = "C:\\Users\\Lyiyang1\\Desktop\\wspr\\"
+dir = "C:\\Users\\caden\\Documents\\code\\Real\\WSPR\\"
